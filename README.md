@@ -1,0 +1,1 @@
+This program parses simple GEDCOM files, and detects any errors and anomalies within them.
