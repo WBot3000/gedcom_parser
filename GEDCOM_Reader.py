@@ -1,31 +1,36 @@
-#Walker Bove
-#Assignment 3: Improved GEDCOM Data
+#Walker Bove, Sindhu Buggana, Sri Laya Nalmelwar, Hindu Kotha
+#Assignment 3: GEDCOM Reader
 
 import os
 from datetime import date
+from prettytable import PrettyTable
 
-from GEDCOM_Classes import Individual, Family, GEDCOMReadException
-
-#Valid tags for each level. The index corresponds to the level of the tag
-#NOTE: "INDI" and "FAM" are not included in the level 0 tags, since those two tags are special cases that are handled using a different method
-validTags = [
-    ["HEAD", "TRLR", "NOTE"],
-    ["NAME", "SEX", "BIRT", "DEAT", "FAMC", "FAMS", "MARR", "HUSB", "WIFE", "CHIL", "DIV"],
-    ["DATE"]
-]
+from GEDCOM_Classes import GEDCOMUnit, Individual, Family, GEDCOMReadException
 
 #Storage for all of the individual records
 # IDs are the keys, Individual objects are the values
-indi_map = {}
+indi_map: dict[str, Individual] = {}
 
 #Storage for all of the family records
 # IDs are the keys, Family objects are the values
-fam_map = {}
+fam_map: dict[str, Family] = {}
 
 #The current object that's being read. Can be either an Individual or a Family
-current_obj = None
+current_obj: GEDCOMUnit = None
 
-#The last seen date tag
+#Used to add the current object to either the Individual or Family maps
+def addToMap(unit: GEDCOMUnit) -> None:
+    if(unit is None):
+        pass
+    elif(isinstance(unit, Individual)):
+        indi_map.update({unit.id: unit})
+    elif(isinstance(unit, Family)):
+        fam_map.update({unit.id: unit})
+    else:
+        raise GEDCOMReadException("Attempting to add non-GEDCOMUnit object to either the Individual or Family maps")
+
+#The last seen date tag. Used to determine what field to fill in
+readingDateOf: str = None
 
 #Maps months to their integer value
 monthToInt = {
@@ -43,6 +48,7 @@ monthToInt = {
     "DEC": 12
 }
 
+#Converts GEDCOM date string into a Python date
 def stringToDate(string: str) -> date:
     if(string == None or string == ""):
         raise GEDCOMReadException("Date is not provided")
@@ -74,44 +80,79 @@ def stringToDate(string: str) -> date:
     return finalDate
 
 
+
 filePath = input("Give the location of the GEDCOM file you'd like to read: ")
 try:
     with open(filePath, "r") as file:
         for line in file:
             try: 
-                fixedLine = line.replace("\n", "") #Remove any newline characters
-                fields = fixedLine.split(" ", 2) #Split the line into at most three seperate parts
-                numFields = len(fields)
+                fixedLine: str = line.replace("\n", "") #Remove any newline characters
+                fields: list[str] = fixedLine.split(" ", 2) #Split the line into at most three seperate parts
+                numFields: int = len(fields)
                 if(numFields <= 1):
                     raise GEDCOMReadException("Not enough arguments on the line")
-                match fields[0] : #The number of the line
+                secondField: str = fields[1]
+                match(fields[0]) : #The number of the line
                     case "0":
-                        secondField = fields[1]
                         if(secondField == "HEAD" or secondField == "TRLR" or secondField == "NOTE"):
                             pass #These tags are simply for annotation, you don't need to record any data for them
-                        elif(numFields == 2):
-                            raise GEDCOMReadException("Not enough fields for valid INDI or FAM")
-                        elif(fields[2] == "INDI"):
-                            current_obj = Individual(secondField)
-                        elif(fields[2] == "FAM"):
-                            current_obj = Family(secondField)
+                        elif(numFields == 3):
+                            thirdField: str = fields[2]
+                            if(fields[2] == "INDI"):
+                                addToMap(current_obj) #Add current object to the map before you start with the new Individual
+                                current_obj = Individual(secondField)
+                            elif(fields[2] == "FAM"):
+                                addToMap(current_obj) #Add current object to the map before you start with the new Family
+                                current_obj = Family(secondField)
+                            else:
+                                raise GEDCOMReadException("Invalid tag for 0-numbered line")
                         else:
-                            raise GEDCOMReadException("Invalid tags for 0-numbered line")
+                            raise GEDCOMReadException("Invalid tag for 0-numbered line")
                     case "1":
-                        pass
+                        #Check to make sure object exists, then check if line is specifying a type of date or just a standard field
+                        if(current_obj is None):
+                            raise GEDCOMReadException("No GEDCOM Unit (Individual or Family) to give field")
+                        elif(secondField == "BIRT" or secondField == "DEAT" or secondField == "MARR" or secondField == "DIV"):
+                            readingDateOf = secondField
+                        else:
+                            current_obj.readDataFromFields(fields) #TODO: Change from taking in fields to taking in tag and argument?
                     case "2":
+                        #Check for errors, then set date to appropriate field
                         if(fields[1] != "DATE"):
                             raise GEDCOMReadException("Invalid tags for 2-numbered line")
                         if(numFields == 2):
                             raise GEDCOMReadException("Not enough fields for DATE")
-                        lineDate = stringToDate(fields[2])
-                        #TODO: Finish this
+                        if(current_obj is None):
+                            raise GEDCOMReadException("No GEDCOM Unit (Individual or Family) to give field")
+                        if(readingDateOf is None):
+                            raise GEDCOMReadException("Type of date has not been specified")
+                        dateObj: date = stringToDate(fields[2])
+                        current_obj.setDate(dateObj, readingDateOf)
+                        readingDateOf = None
                         pass
                     case _: #Since all lines are assumed to be syntatically correct, this technically isn't needed
                         raise GEDCOMReadException("Line number is not valid (0, 1, 2)")
-            except GEDCOMReadException as e:
+            except Exception as e:
                 print("Error reading line: " + e.message)
+
+        addToMap(current_obj) #Add the latest object into the maps
+        print("Done reading in data")
 except OSError as e:
     print("OS Error encountered: " + os.strerror(e.errno))
 except Exception as e:
     print("Error encountered: " + os.strerror(e.errno))
+
+indiTable = PrettyTable(Individual.createRowHeader())
+for indi in indi_map.values():
+    indiTable.add_row(indi.createRowData())
+
+famTable = PrettyTable(Family.createRowHeader())
+for fam in fam_map.values():
+    famTable.add_row(fam.createRowData(indi_map)) #Need to pass in the map of individuals so the names can be printed
+
+print("Individuals")
+print(indiTable)
+print()
+
+print("Families")
+print(famTable)
