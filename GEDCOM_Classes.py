@@ -160,10 +160,10 @@ class Family(GEDCOMUnit):
         else:
             rowData.append(str(self.marriageDate.year) + "-" + str(self.marriageDate.month) + "-" + str(self.marriageDate.day))
         #Checking to see if divorce date exists, and formatting it appropriately if it does
-        if(self.marriageDate is None):
+        if(self.divorceDate is None):
             rowData.append("NA")
         else:
-            rowData.append(str(self.marriageDate.year) + "-" + str(self.marriageDate.month) + "-" + str(self.marriageDate.day))
+            rowData.append(str(self.divorceDate.year) + "-" + str(self.divorceDate.month) + "-" + str(self.divorceDate.day))
         #Making sure husband ID exists (and name)
         if(self.husbandId is None):
             rowData.append("NA") #Husband ID
