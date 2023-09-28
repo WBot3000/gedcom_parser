@@ -7,32 +7,13 @@ from datetime import date
 from classes.GEDCOM_Units import GEDCOMUnit, Individual, Family, GEDCOMReadException
 from classes.GEDCOM_Reporting import Report
 
+#Stores all report data
 report: Report = Report()
-#Storage for all of the individual records
-# IDs are the keys, Individual objects are the values
-#indi_map: dict[str, Individual] = {}
-
-#Storage for all of the family records
-# IDs are the keys, Family objects are the values
-#fam_map: dict[str, Family] = {}
-
-
-
-#Used to add the current object to either the Individual or Family maps
-#def addToMap(unit: GEDCOMUnit) -> None:
-#    if(unit is None):
-#        pass
-#    elif(isinstance(unit, Individual)):
-#        indi_map.update({unit.id: unit})
-#    elif(isinstance(unit, Family)):
-#        fam_map.update({unit.id: unit})
-#    else:
-#        raise GEDCOMReadException("Attempting to add non-GEDCOMUnit object to either the Individual or Family maps")
 
 #The current object that's being read. Can be either an Individual or a Family
 current_obj: GEDCOMUnit = None
 
-#The last seen date tag. Used to determine what field to fill in
+#The last seen tag that correpsonds to a date (BIRT, DEAT, MARR, DIV). Used to determine what field to fill in
 readingDateOf: str = None
 
 
