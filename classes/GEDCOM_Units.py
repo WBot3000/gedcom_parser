@@ -22,7 +22,7 @@ class GEDCOMUnit(ABC):
         pass
 
     @abstractmethod
-    def createRowData(self) -> list[str]:
+    def getRowData(self) -> list[str]:
         pass
 
 
@@ -73,7 +73,7 @@ class Individual(GEDCOMUnit):
     def createRowHeader() -> list[str]:
         return ["ID", "Name", "Sex", "Birthday", "Age", "Alive", "Death", "Child", "Spouse"]
     
-    def createRowData(self) -> list[str]:
+    def getRowData(self) -> list[str]:
         rowData: list[str] = [self.id]
         #Making sure name exists
         if(self.name is None):
@@ -152,7 +152,7 @@ class Family(GEDCOMUnit):
         return ["ID", "Married", "Divorced", "Husband ID", "Husband Name", "Wife ID", "Wife Name", "Children"]
     
     #This function takes a dictionary that maps ids to individuals, as the Family object doesn't store this directly
-    def createRowData(self, indiLookup: dict[str, Individual] = None) -> list[str]:
+    def getRowData(self, indiLookup: dict[str, Individual] = None) -> list[str]:
         rowData: list[str] = [self.id]
         #Checking to see if marriage date exists, and formatting it appropriately if it does
         if(self.marriageDate is None):
