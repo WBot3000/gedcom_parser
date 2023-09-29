@@ -11,21 +11,33 @@ testCaseClassArray = [None, None, None, None, None, None, None, None, None, None
                       None, None, None, None, None, None, None, None, None, None,
                       None, None]
 
+def printTestCases(usNum: int):
+    if(usNum < 1 or usNum > 42):
+        raise ValueError("Number provided not between 1 and 42")
+    testCaseClass = testCaseClassArray[usNum - 1]
+    if(testCaseClass is None):
+        raise Exception("Test cases for US" + str(usNum) + " yet to be implemented.")
+    cases = unittest.TestLoader().loadTestsFromTestCase(testCaseClass)
+    print("\n[||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||]")
+    unittest.TextTestRunner(verbosity=2).run(cases)
+    print("[||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||]\n")
+
 while(True):
-    testCaseVal: str = input("Which set of test cases do you want to run (Provide a number from 1-42, write EXIT to exit the program)? ")
+    testCaseVal: str = input("Which set of test cases do you want to run (Provide a number from 1-42, write ALL to run all 42 test suites, write EXIT to exit the program)? ")
     try:
-        if(testCaseVal.strip().upper() == "EXIT"):
+        fixedVal: str = testCaseVal.strip().upper()
+        if(fixedVal == "EXIT"):
             print("Goodbye")
             break
-        testCaseNum = int(testCaseVal)
-        if(testCaseNum < 1 or testCaseNum > 42):
-            raise ValueError("Number provided not between 1 and 42")
-        testCaseClass = testCaseClassArray[testCaseNum - 1]
-        if(testCaseClass is None):
-            raise Exception("Test cases for US" + str(testCaseNum) + " yet to be implemented.")
-        cases = unittest.TestLoader().loadTestsFromTestCase(testCaseClass)
-        print("\n[||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||]")
-        unittest.TextTestRunner(verbosity=2).run(cases)
-        print("[||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||]\n")
+        elif(fixedVal == "ALL"):
+            for num in range(len(testCaseClassArray)):
+                try:
+                    printTestCases(num+1)
+                except Exception as e:
+                    print(e)
+            print()
+        else:
+            testCaseNum = int(testCaseVal)
+            printTestCases(testCaseNum)
     except Exception as e:
         print(e)
