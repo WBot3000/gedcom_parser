@@ -1,6 +1,4 @@
 import unittest
-import sys
-import os
 
 #Need this to import modules inside sibling directories
 #current_directory = os.path.dirname(__file__)

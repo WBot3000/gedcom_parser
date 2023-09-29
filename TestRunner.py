@@ -2,6 +2,7 @@ import unittest
 
 #Unit Test Classes
 from tests.US22_Tests import US22_Tests as us22
+from tests.US42_Tests import US42_Tests as us42
 
 #Index of the array is the number of the corresponding user story minus 1
 #Fill this out as test case files are written
@@ -9,7 +10,7 @@ testCaseClassArray = [None, None, None, None, None, None, None, None, None, None
                       None, None, None, None, None, None, None, None, None, None, 
                       None, us22, None, None, None, None, None, None, None, None,
                       None, None, None, None, None, None, None, None, None, None,
-                      None, None]
+                      None, us42]
 
 def printTestCases(usNum: int):
     if(usNum < 1 or usNum > 42):

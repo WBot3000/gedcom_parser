@@ -37,7 +37,7 @@ def stringDateConversion(string: str) -> date:
     #Parse month
     month: int = monthToInt.get(dateParts[1])
     if(month is None):
-        raise GEDCOMReadException("<month> of date (" + dateParts[1] + ") is not a valid string")
+        raise GEDCOMReadException("<month> of date (" + dateParts[1] + ") is not a valid month string")
     #Parse year
     year: int
     try:
