@@ -51,7 +51,7 @@ class US22_Tests(unittest.TestCase):
         indiA2: Individual = Individual(idA2)
         testReport.addToMap(indiA2)
 
-        idA3 = testReport.generateId("c")
+        idA3 = testReport.generateId("a")
         indiA3: Individual = Individual(idA3)
         testReport.addToMap(indiA3)
 

@@ -81,8 +81,16 @@ class Report():
         if(unit is None):
             pass
         elif(isinstance(unit, Individual)):
+            dup_check: Individual = self.indi_map.get(unit.id, None)
+            if(dup_check is not None):
+                newId: str = self.generateId(unit.id)
+                unit.id = newId
             self.indi_map.update({unit.id: unit})
         elif(isinstance(unit, Family)):
+            dup_check: Family = self.fam_map.get(unit.id, None)
+            if(dup_check is not None):
+                newId: str = self.generateId(unit.id)
+                unit.id = newId
             self.fam_map.update({unit.id: unit})
         else:
             raise GEDCOMReadException("Attempting to add non-GEDCOMUnit object to either the Individual or Family maps")
@@ -93,7 +101,7 @@ class Report():
     #Right now, if the shared ID is used in a family, it will automatically assume it's meant for the first person. I don't think there's a way to account for this given the limitations of GEDCOM files
     def generateId(self, id) -> str:
         if(id in self.indi_map or id in self.fam_map):
-            self.errors.append(ReportDetail("Duplicate IDs", id + " already used"))
+            self.errors.append(ReportDetail("Duplicate IDs", id + " is already used"))
             numDuplicates: int = self.duplicate_id_map.get(id, 1) #numDuplicates is 1 less than the amount of total times the ID appears in total (since the original isn't a duplicate)
             self.duplicate_id_map.update({id: numDuplicates + 1})
             #This uses a space, since GEDCOM IDs can't have spaces in them normally (due to how the line is parsed). Therefore, this new ID will definitely be unique
@@ -169,6 +177,11 @@ class ReportDetail():
     def __init__(self, detailType, message):
         self.detailType = detailType
         self.message = message
+
+    def __eq__(self, other: object) -> bool:
+        if(isinstance(other, ReportDetail)):
+            return self.detailType == other.detailType and self.message == other.message
+        return False
 
     def getRowData(self):
         return [self.detailType, self.message]
