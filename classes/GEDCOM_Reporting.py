@@ -97,6 +97,7 @@ class Report():
 
     
     #US22 - Unique IDs
+    #TODO: Rename to mention checking for multiple IDs
     #This takes a passed in ID, checks if it's a duplicate, and if it is, then note it as an error and change it to make it unique
     #Right now, if the shared ID is used in a family, it will automatically assume it's meant for the first person. I don't think there's a way to account for this given the limitations of GEDCOM files
     def generateId(self, id) -> str:
@@ -157,15 +158,19 @@ class Report():
 
         print("Families:")
         print(famTable)
+        print()
 
         print("Errors:")
         print(errorTable)
+        print()
 
         print("Anomalies:")
         print(anomalyTable)
+        print()
 
         print("Upcoming Birthdays:")
         print(bdayTable)
+        print()
 
         print("Upcoming Anniversaries:")
         print(anniversaryTable)

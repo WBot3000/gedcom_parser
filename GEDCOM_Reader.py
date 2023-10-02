@@ -80,5 +80,6 @@ except OSError as e:
     print("OS Error encountered: " + os.strerror(e.errno))
 except Exception as e:
     print("Error encountered: " + os.strerror(e.errno))
+    
 
 report.printReport()
