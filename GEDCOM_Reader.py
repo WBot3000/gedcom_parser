@@ -81,5 +81,8 @@ except OSError as e:
 except Exception as e:
     print("Error encountered: " + os.strerror(e.errno))
     
+#Checks
+report.marriage_before_death()
 
+#Printing the report
 report.printReport()
