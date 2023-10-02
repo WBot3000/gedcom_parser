@@ -82,6 +82,8 @@ except Exception as e:
     print("Error encountered: " + os.strerror(e.errno))
 
 #Checks
+report.birth_before_marriage() #US02
+report.birth_before_death() #US03
 report.marriage_before_death() #US05
 report.divorce_before_death() #US06
 report.check_correct_gender_for_roles() #US21

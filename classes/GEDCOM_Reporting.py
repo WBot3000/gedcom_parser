@@ -96,6 +96,23 @@ class Report():
         else:
             raise GEDCOMReadException("Attempting to add non-GEDCOMUnit object to either the Individual or Family maps")
 
+    #US02 - Birth before Marriage
+    # This is to check if birth occurred before marriage of an individual
+    def birth_before_marriage(self):
+        for fam in self.fam_map.values():
+            husband = self.indi_map.get(fam.husbandId, None)
+            if(husband and husband.birthDate and husband.birthDate < fam.marriageDate):
+                self.errors.append(ReportDetail("Birth After Marriage", "Birth of " + husband.id + " (" +  str(husband.birthDate) + ") occurred after their marriage (" + str(fam.marriageDate) + ")"))
+            wife = self.indi_map.get(fam.wifeId, None)
+            if(wife and wife.birthDate and wife.birthDate < fam.marriageDate):
+                self.errors.append(ReportDetail("Birth After Marriage", "Birth of " + wife.id + " (" +  str(wife.birthDate) + ") occurred after their marriage (" + str(fam.marriageDate) + ")"))
+    
+    #US03 - Birth before Death
+    # This is to check if birth occurred before death of an individual
+    def birth_before_death(self):
+        for indi in self.indi_map.values():
+            if indi.birthDate and indi.deathDate and indi.deathDate < indi.birthDate:
+                self.errors.append(ReportDetail("Birth After Death", "Birth of " + id + " (" + str(indi.birthDate) + ") occurs after their death (" + str(indi.deathDate) + ")" ))
 
     #US05 - Marriage before death  
     # Marriage should occur before death of either spouse
