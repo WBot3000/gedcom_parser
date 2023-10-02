@@ -77,6 +77,7 @@ class Report():
 
 
     #Used to add the current object to either the Individual or Family maps
+    #TODO: Change this to addToReport, is more clear
     def addToMap(self, unit: GEDCOMUnit) -> None:
         if(unit is None):
             pass
@@ -142,6 +143,31 @@ class Report():
                     self.errors.append(ReportDetail("Incorrect Sex", f"Wife in family {fam.id} is male"))
 
     
+    #US05 - Marriage before death  
+    # Marriage should occur before death of either spouse
+    def marriage_before_death(self):
+        for fam in self.fam_map.values():
+            husband = self.indi_map.get(fam.husbandId, None)
+            if(husband and husband.deathDate and husband.deathDate < fam.marriageDate):
+                self.errors.append(ReportDetail("Marriage After Death", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs after their death (" + str(husband.deathDate) + ")"))
+            wife = self.indi_map.get(fam.wifeId, None)
+            if(wife and wife.deathDate and wife.deathDate < fam.marriageDate):
+                self.errors.append(ReportDetail("Marriage After Death", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs after their death (" + str(wife.deathDate) + ")"))
+
+
+    #US06 - Divorce before death
+    # Divorce can only occur before death of both spouses
+    def divorce_before_death(self):
+        for fam in self.fam_map.values():
+            husband = self.indi_map.get(fam.husbandId, None)
+            wife = self.indi_map.get(fam.wifeId, None)
+            
+            if (husband and husband.deathDate) and (wife and wife.deathDate) and fam.divorceDate:
+                if fam.divorceDate > husband.deathDate and fam.divorceDate > wife.deathDate:
+                    self.errors.append(ReportDetail("Divorce After Death", f"Divorce for family {fam.id} ({(fam.divorceDate)}) occurs after the death of the husband ({str(husband.deathDate)}) and the wife ({str(wife.deathDate)})"))
+
+
+
     #US22 - Unique IDs
     #TODO: Rename to mention checking for multiple IDs
     #This takes a passed in ID, checks if it's a duplicate, and if it is, then note it as an error and change it to make it unique
