@@ -80,10 +80,12 @@ except OSError as e:
     print("OS Error encountered: " + os.strerror(e.errno))
 except Exception as e:
     print("Error encountered: " + os.strerror(e.errno))
-    
+
 #Checks
 report.marriage_before_death() #US05
 report.divorce_before_death() #US06
+report.check_correct_gender_for_roles() #US21
+report.check_unique_name_and_birth_date() #US23
 
 #Printing the report
 report.printReport()
