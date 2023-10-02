@@ -206,7 +206,6 @@ class Report():
                     if i < len(duplicates) - 1:
                         detailStr += ","
                     detailStr += " "
-                print(key)
                 sharedDetails = key.split(" ")
                 sharedBDay = sharedDetails.pop()
                 sharedName = ""
