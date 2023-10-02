@@ -1,0 +1,38 @@
+0 HEAD
+0 NOTE Acceptance Test GEDCOM File for WBot3000/gedcom_parser. Should mention all 8 errors for each user story
+0 bi00 INDI
+1 NAME Walker /Bove/
+1 SEX M
+1 BIRT
+2 DATE 28 NOV 2001
+0 NOTE ------------------------------------------------
+0 bi00 INDI
+1 NAME Walker /Bove/
+1 SEX M
+1 BIRT
+2 DATE 28 NOV 2001
+0 NOTE ------------------------------------------------
+0 bi01 INDI
+1 NAME Outta /Order/
+1 SEX M
+1 BIRT
+2 DATE 1 JAN 1990
+1 DEAT
+2 DATE 1 JAN 1960
+1 FAMS f00
+0 NOTE ------------------------------------------------
+0 bi02 INDI
+1 NAME Delilah /Dee/
+1 SEX F
+1 BIRT
+2 DATE 10 MAU 1994
+1 FAMS f00
+0 NOTE ------------------------------------------------
+0 f00 FAM
+1 HUSB bi02
+1 WIFE bi01
+1 MARR
+2 DATE 15 FEB 1985
+1 DIV
+2 DATE 4 APR 1980
+0 TRLR

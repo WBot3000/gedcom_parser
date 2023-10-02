@@ -1,8 +1,4 @@
 import unittest
-
-#Need this to import modules inside sibling directories
-#current_directory = os.path.dirname(__file__)
-#sibling_directory = os.path.join(current_directory, "..", "")
 from classes.GEDCOM_Reporting import Report, ReportDetail
 from classes.GEDCOM_Units import GEDCOMUnit, Individual, Family
 
