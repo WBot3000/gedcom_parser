@@ -95,6 +95,52 @@ class Report():
         else:
             raise GEDCOMReadException("Attempting to add non-GEDCOMUnit object to either the Individual or Family maps")
 
+
+    #US05 - Marriage before death  
+    # Marriage should occur before death of either spouse
+    def marriage_before_death(self):
+        for fam in self.fam_map.values():
+            husband = self.indi_map.get(fam.husbandId, None)
+            if(husband and husband.deathDate and husband.deathDate < fam.marriageDate):
+                self.errors.append(ReportDetail("Marriage After Death", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs after their death (" + str(husband.deathDate) + ")"))
+            wife = self.indi_map.get(fam.wifeId, None)
+            if(wife and wife.deathDate and wife.deathDate < fam.marriageDate):
+                self.errors.append(ReportDetail("Marriage After Death", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs after their death (" + str(wife.deathDate) + ")"))
+
+
+    #US06 - Divorce before death
+    # Divorce can only occur before death of both spouses
+    def divorce_before_death(self):
+        for fam in self.fam_map.values():
+            husband = self.indi_map.get(fam.husbandId, None)
+            wife = self.indi_map.get(fam.wifeId, None)
+            
+            if (husband and husband.deathDate) and (wife and wife.deathDate) and fam.divorceDate:
+                if fam.divorceDate > husband.deathDate and fam.divorceDate > wife.deathDate:
+                    self.errors.append(ReportDetail("Divorce After Death", f"Divorce for family {fam.id} ({(fam.divorceDate)}) occurs after the death of the husband ({str(husband.deathDate)}) and the wife ({str(wife.deathDate)})"))
+
+
+    #US21 - Correct Gender of Role
+    def check_correct_gender_for_roles(self):
+        # Iterate through all families in the GEDCOM file
+        for fam in self.fam_map.values():
+            husband_id = fam.husbandId
+            wife_id = fam.wifeId
+            
+            # Check the husband's gender
+            if husband_id:
+                husband = self.indi_map.get(husband_id)
+                if husband and husband.sex != "M":
+                    # Add the issue to the list
+                    self.errors.append(ReportDetail("Incorrect Sex", f"Husband in family {fam.id} is female"))
+            
+            # Check the wife's gender
+            if wife_id:
+                wife = self.indi_map.get(wife_id)
+                if wife and wife.sex != "F":
+                    # Add the issue to the list
+                    self.errors.append(ReportDetail("Incorrect Sex", f"Wife in family {fam.id} is male"))
+
     
     #US22 - Unique IDs
     #TODO: Rename to mention checking for multiple IDs
@@ -108,8 +154,50 @@ class Report():
             #This uses a space, since GEDCOM IDs can't have spaces in them normally (due to how the line is parsed). Therefore, this new ID will definitely be unique
             return id + " (" + str(numDuplicates) + ")"
         return id
+    
 
+    #US23 - Unique Name and Birth Date
+    def check_unique_name_and_birth_date(self):
+        # Dictionary to store individuals based on name and birth date
+        name_birth_dict = {}
 
+        # Iterate through all individuals in the GEDCOM file
+        for indi in self.indi_map.values():
+            # Check if the individual has a name and a birth date
+            if indi.name and indi.birthDate:
+                # Create a unique key based on name and birth date
+                unique_key = f"{indi.name} {indi.birthDate}"
+                
+                # Check if the unique key already exists in the dictionary
+                if unique_key in name_birth_dict:
+                    # If the key exists, it means there's already an individual with the same name and birth date
+                    # Add the issue to the list of duplicates
+                    name_birth_dict[unique_key].append(indi.id)
+                else:
+                    # If the key doesn't exist, create a list for it and add the individual
+                    name_birth_dict[unique_key] = [indi.id]
+
+        # Iterate through the dictionary to find duplicates
+        for key, duplicates in name_birth_dict.items():
+            if len(duplicates) > 1:
+                # If there are duplicates, create a new anomaly detailing all of them
+                detailStr = ""
+                for i in range(len(duplicates)):
+                    #print(f"Multiple individuals with the same name '{issue[0]['name']}' and birth date '{issue[0]['birth_date']}' found:")
+                    detailStr += duplicates[i]
+                    if i < len(duplicates) - 1:
+                        detailStr += ","
+                    detailStr += " "
+                print(key)
+                sharedDetails = key.split(" ")
+                sharedBDay = sharedDetails.pop()
+                sharedName = ""
+                for namePart in sharedDetails: #Need to reassemble the name
+                    sharedName += namePart
+                detailStr += f"share a name ({sharedName}) and birthday ({sharedBDay})"
+                self.anomalies.append(ReportDetail("Duplicate Name and Birthdate", detailStr))
+
+                    
     #US42 - Reject invalid dates
     #Wrapper around conversion function. Returns None if an error occurs
     def getDateFromString(self, string: str) -> str:
