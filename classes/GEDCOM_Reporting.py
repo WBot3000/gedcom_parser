@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from datetime import date
+from datetime import date, datetime
 from prettytable import PrettyTable
 from classes.GEDCOM_Units import GEDCOMUnit, Individual, Family, GEDCOMReadException
 
@@ -72,29 +72,37 @@ class Report():
         self.upcomingBirthdays: list[ReportDetail] = []
         self.upcomingAnniversaries: list[ReportDetail] = []
 
+        #Used for US01 - Dates before current date. Micro-optimization so that this doesn't need to be recalculated for every date checked (since it won't change).
+        self.run_date: date = datetime.today().date()
         #Used for US22 - Unique IDs. Key is ID that's attempting to be duplicated, int is the amount of times it's duplicated (used to differentiate between IDs)
         self.duplicate_id_map: dict[str, int] = {}
 
 
     #Used to add the current object to either the Individual or Family maps
-    #TODO: Change this to addToReport, is more clear
-    def addToMap(self, unit: GEDCOMUnit) -> None:
+    def addToReport(self, unit: GEDCOMUnit) -> None:
         if(unit is None):
             pass
         elif(isinstance(unit, Individual)):
             dup_check: Individual = self.indi_map.get(unit.id, None)
             if(dup_check is not None):
-                newId: str = self.generateId(unit.id)
+                newId: str = self.generate_unique_id(unit.id)
                 unit.id = newId
             self.indi_map.update({unit.id: unit})
         elif(isinstance(unit, Family)):
             dup_check: Family = self.fam_map.get(unit.id, None)
             if(dup_check is not None):
-                newId: str = self.generateId(unit.id)
+                newId: str = self.generate_unique_id(unit.id)
                 unit.id = newId
             self.fam_map.update({unit.id: unit})
         else:
             raise GEDCOMReadException("Attempting to add non-GEDCOMUnit object to either the Individual or Family maps")
+
+
+    #US01 - Dates before current date
+    # Make sure all of the dates present in the file occur before the scanning of the file.
+    def check_for_future_dates(self, dateVal : date):
+        if(dateVal and dateVal > self.run_date):
+            self.errors.append(ReportDetail("Future Date", f"Date that has yet to happen ({dateVal}) has been detected"))
 
     #US02 - Birth before Marriage
     # This is to check if birth occurred before marriage of an individual
@@ -164,7 +172,7 @@ class Report():
     #TODO: Rename to mention checking for multiple IDs
     #This takes a passed in ID, checks if it's a duplicate, and if it is, then note it as an error and change it to make it unique
     #Right now, if the shared ID is used in a family, it will automatically assume it's meant for the first person. I don't think there's a way to account for this given the limitations of GEDCOM files
-    def generateId(self, id) -> str:
+    def generate_unique_id(self, id) -> str:
         if(id in self.indi_map or id in self.fam_map):
             self.errors.append(ReportDetail("Duplicate IDs", id + " is already used"))
             numDuplicates: int = self.duplicate_id_map.get(id, 1) #numDuplicates is 1 less than the amount of total times the ID appears in total (since the original isn't a duplicate)

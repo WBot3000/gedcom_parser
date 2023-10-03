@@ -11,9 +11,9 @@ class US02_Tests(unittest.TestCase):
         family = Family ("F1", husband.id, wife.id)
         family.marriageDate = date(1989, 11, 26)
 
-        testReport.addToMap(husband)
-        testReport.addToMap(wife)
-        testReport.addToMap(family)
+        testReport.addToReport(husband)
+        testReport.addToReport(wife)
+        testReport.addToReport(family)
 
         testReport.birth_before_marriage()
         self.assertEqual(len(testReport.errors), 0)
@@ -25,9 +25,9 @@ class US02_Tests(unittest.TestCase):
         family = Family ("F1", husband.id, wife.id)
         family.marriageDate = date(1969, 11, 26)
 
-        testReport.addToMap(husband)
-        testReport.addToMap(wife)
-        testReport.addToMap(family)
+        testReport.addToReport(husband)
+        testReport.addToReport(wife)
+        testReport.addToReport(family)
 
         testReport.birth_before_marriage()
         self.assertEqual(testReport.errors[0].message, "Birth of I1 (1971-02-23) occurred after their marriage (1969-11-26)")
@@ -39,9 +39,9 @@ class US02_Tests(unittest.TestCase):
         family = Family ("F1", husband.id, wife.id)
         family.marriageDate = date(1965, 11, 26)
 
-        testReport.addToMap(husband)
-        testReport.addToMap(wife)
-        testReport.addToMap(family)
+        testReport.addToReport(husband)
+        testReport.addToReport(wife)
+        testReport.addToReport(family)
 
         testReport.birth_before_marriage()
         self.assertEqual(testReport.errors[0].message, "Birth of I2 (1967-12-28) occurred after their marriage (1965-11-26)")
@@ -53,9 +53,9 @@ class US02_Tests(unittest.TestCase):
         family = Family ("F1", husband.id, wife.id)
         family.marriageDate = date(1959, 11, 26)
 
-        testReport.addToMap(husband)
-        testReport.addToMap(wife)
-        testReport.addToMap(family)
+        testReport.addToReport(husband)
+        testReport.addToReport(wife)
+        testReport.addToReport(family)
 
         testReport.birth_before_marriage()
         self.assertEqual(testReport.errors[0].message, "Birth of I1 (1971-02-23) occurred after their marriage (1959-11-26)")
@@ -67,9 +67,9 @@ class US02_Tests(unittest.TestCase):
         family = Family ("F1", husband.id, wife.id)
         family.marriageDate = date(1967, 11, 26)
 
-        testReport.addToMap(husband)
-        testReport.addToMap(wife)
-        testReport.addToMap(family)
+        testReport.addToReport(husband)
+        testReport.addToReport(wife)
+        testReport.addToReport(family)
 
         testReport.birth_before_marriage()
         self.assertEqual(len(testReport.errors), 0)
