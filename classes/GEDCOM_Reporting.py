@@ -146,6 +146,16 @@ class Report():
                     self.errors.append(ReportDetail("Divorce After Death", f"Divorce for family {fam.id} ({(fam.divorceDate)}) occurs after the death of the husband ({str(husband.deathDate)}) and the wife ({str(wife.deathDate)})"))
 
 
+    #US07 - Less than 150 years old
+    # Make sure all individuals are less than 150 years old
+    def check_max_age(self):
+        for indi in self.indi_map.values():
+            if(indi.birthDate):
+                age: int = indi.calculateAge()
+                if(age > 150):
+                    self.anomalies.append(ReportDetail("Over 150 Years Old", f"{indi.id} is over 150 years old ({age} years old)"))
+
+
     #US21 - Correct Gender of Role
     def check_correct_gender_for_roles(self):
         # Iterate through all families in the GEDCOM file

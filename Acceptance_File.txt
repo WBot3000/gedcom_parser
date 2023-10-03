@@ -37,4 +37,10 @@
 2 DATE 15 FEB 1980
 1 DIV
 2 DATE 4 APR 2010
+0 NOTE ------------------------------------------------
+0 bi03 INDI
+1 NAME Old /Oldenson/
+1 SEX M
+1 BIRT
+2 DATE 1 JAN 1800
 0 TRLR
