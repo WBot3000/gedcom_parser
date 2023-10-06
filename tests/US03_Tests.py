@@ -8,7 +8,7 @@ class US03_Tests(unittest.TestCase):
         testReport: Report = Report()
         individual = Individual ("I1", "Jon Snow", "M", date(1971, 2, 23), date(2021, 2, 23))
         
-        testReport.addToMap(individual)
+        testReport.addToReport(individual)
 
         testReport.birth_before_death()
         self.assertEqual(len(testReport.errors), 0)
@@ -17,7 +17,7 @@ class US03_Tests(unittest.TestCase):
         testReport: Report = Report()
         individual = Individual ("I1", "Jon Snow", "M", date(1971, 2, 23), date(1921, 2, 23))
         
-        testReport.addToMap(individual)
+        testReport.addToReport(individual)
 
         testReport.birth_before_death()
         self.assertEqual(testReport.errors[0].message, "Birth of I1 (1971-02-23) occurs after their death (1921-02-23)")
@@ -26,7 +26,7 @@ class US03_Tests(unittest.TestCase):
         testReport: Report = Report()
         individual = Individual ("I1", "Jon Snow", "M", date(2045, 2, 23), date(2021, 2, 23))
         
-        testReport.addToMap(individual)
+        testReport.addToReport(individual)
 
         testReport.birth_before_death()
         self.assertEqual(testReport.errors[0].message, "Birth of I1 (2045-02-23) occurs after their death (2021-02-23)")
@@ -35,7 +35,7 @@ class US03_Tests(unittest.TestCase):
         testReport: Report = Report()
         individual = Individual ("I1", "Jon Snow", "M", date(2021, 2, 23), date(2021, 2, 23))
         
-        testReport.addToMap(individual)
+        testReport.addToReport(individual)
 
         testReport.birth_before_death()
         self.assertEqual(len(testReport.errors), 0)
@@ -44,7 +44,7 @@ class US03_Tests(unittest.TestCase):
         testReport: Report = Report()
         individual = Individual ("I1", "Jon Snow", "M", date(2021, 2, 23), date(2021, 12, 23))
         
-        testReport.addToMap(individual)
+        testReport.addToReport(individual)
 
         testReport.birth_before_death()
         self.assertEqual(len(testReport.errors), 0)

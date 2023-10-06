@@ -36,12 +36,12 @@ try:
                         elif(numFields == 3):
                             thirdField: str = fields[2]
                             if(fields[2] == "INDI"):
-                                report.addToMap(current_obj) #Add current object to the map before you start with the new Individual
-                                fixedId: str = report.generateId(secondField) #Checks for duplicate IDs
+                                report.addToReport(current_obj) #Add current object to the map before you start with the new Individual
+                                fixedId: str = report.generate_unique_id(secondField) #Checks for duplicate IDs, #US22
                                 current_obj = Individual(fixedId)
                             elif(fields[2] == "FAM"):
-                                report.addToMap(current_obj) #Add current object to the map before you start with the new Family
-                                fixedId: str = report.generateId(secondField)
+                                report.addToReport(current_obj) #Add current object to the map before you start with the new Family
+                                fixedId: str = report.generate_unique_id(secondField)
                                 current_obj = Family(secondField)
                             else:
                                 raise GEDCOMReadException("Invalid tag for 0-numbered line")
@@ -65,7 +65,8 @@ try:
                             raise GEDCOMReadException("No GEDCOM Unit (Individual or Family) to give field")
                         if(readingDateOf is None):
                             raise GEDCOMReadException("Type of date has not been specified")
-                        dateObj: date = report.getDateFromString(fields[2])
+                        dateObj: date = report.getDateFromString(fields[2]) #US42
+                        report.check_for_future_dates(dateObj) #US01
                         current_obj.setDate(dateObj, readingDateOf)
                         readingDateOf = None
                         pass
@@ -74,7 +75,7 @@ try:
             except Exception as e:
                 print("Error reading line: " + e.message)
 
-        report.addToMap(current_obj) #Add the latest object into the maps
+        report.addToReport(current_obj) #Add the latest object into the maps
         print("Done reading in data")
 except OSError as e:
     print("OS Error encountered: " + os.strerror(e.errno))
@@ -86,6 +87,7 @@ report.birth_before_marriage() #US02
 report.birth_before_death() #US03
 report.marriage_before_death() #US05
 report.divorce_before_death() #US06
+report.check_max_age() #US07
 report.check_correct_gender_for_roles() #US21
 report.check_unique_name_and_birth_date() #US23
 

@@ -63,9 +63,9 @@ class Individual(GEDCOMUnit):
     def calculateAge(self) -> int:
         if(self.birthDate is None):
             raise ValueError
-        today: date = date.today()
-        age: int = today.year - self.birthDate.year
-        if(self.birthDate.month > today.month or (self.birthDate.month == today.month and self.birthDate.day > today.day)): #Subtract one if birthday month hasn't come up yet, or if birthday is this month, but day hasn't passed yet
+        boundaryDate: date = self.deathDate if self.deathDate else date.today()
+        age: int = boundaryDate.year - self.birthDate.year
+        if(self.birthDate.month > boundaryDate.month or (self.birthDate.month == boundaryDate.month and self.birthDate.day > boundaryDate.day)): #Subtract one if birthday month hasn't come up yet, or if birthday is this month, but day hasn't passed yet
             age = age - 1
         return age
 
