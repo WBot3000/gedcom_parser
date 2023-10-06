@@ -232,7 +232,22 @@ class Report():
                 detailStr += f"share a name ({sharedName}) and birthday ({sharedBDay})"
                 self.anomalies.append(ReportDetail("Duplicate Name and Birthdate", detailStr))
 
-                    
+    
+    #US28 - Order siblings by age
+    def sort_children_by_age(self):
+        def age_sorting_fn(indi_id):
+            if(indi_id is None):
+                return date.max
+            indi_data = self.indi_map.get(indi_id, None)
+            if(indi_data is None or indi_data.birthDate is None):
+                return date.max
+            return indi_data.birthDate
+
+        for fam in self.fam_map.values():
+            sorted_siblings = sorted(fam.childIds, key=age_sorting_fn)
+            fam.childIds = sorted_siblings
+
+
     #US42 - Reject invalid dates
     #Wrapper around conversion function. Returns None if an error occurs
     def getDateFromString(self, string: str) -> str:
