@@ -177,6 +177,18 @@ class Report():
                     if (fam.marriageDate.year - wife.birthDate.year < 14):
                         self.errors.append(ReportDetail("Marriage After 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
 
+    # US15 - Fewer than 15 siblings
+def fewer_than_15_siblings(self):
+    # Iterate through all families in the GEDCOM file
+    for fam in self.fam_map.values():
+        # Check the number of children (siblings) in the family
+        if len(fam.childIds) >= 15:
+            # If there are 15 or more children, add an error to the report
+            # This means that the family has too many siblings
+            error_message = f"Family {fam.id} has 15 or more children"
+            self.errors.append(ReportDetail("Too Many Siblings", error_message))
+
+    
     #US21 - Correct Gender of Role
     def check_correct_gender_for_roles(self):
         # Iterate through all families in the GEDCOM file
