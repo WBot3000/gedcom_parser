@@ -85,10 +85,12 @@ except Exception as e:
 #Checks
 report.birth_before_marriage() #US02
 report.birth_before_death() #US03
+report.marriage_before_divorce() #US04
 report.marriage_before_death() #US05
 report.divorce_before_death() #US06
 report.check_max_age() #US07
 report.marriage_after_14() #US10
+report.check_multiple_births() #US14
 report.check_correct_gender_for_roles() #US21
 report.check_unique_name_and_birth_date() #US23
 report.sort_children_by_age() #US28

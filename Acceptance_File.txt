@@ -43,4 +43,70 @@
 1 SEX M
 1 BIRT
 2 DATE 1 JAN 1800
+0 NOTE ------------------------------------------------
+0 bi04 INDI
+1 NAME Minnie /Mouse/
+1 SEX F
+1 FAMS f01
+0 NOTE ------------------------------------------------
+0 bi05 INDI
+1 NAME Mickey /Mouse/
+1 SEX M
+1 FAMS f01
+0 NOTE ------------------------------------------------
+0 bi06 INDI
+1 NAME A /Mouse/
+1 SEX M
+1 BIRT
+2 DATE 3 APR 2010
+1 FAMC f01
+0 NOTE ------------------------------------------------
+0 bi07 INDI
+1 NAME B /Mouse/
+1 SEX F
+1 BIRT
+2 DATE 3 APR 2010
+1 FAMC f01
+0 NOTE ------------------------------------------------
+0 bi08 INDI
+1 NAME C /Mouse/
+1 SEX M
+1 BIRT
+2 DATE 3 APR 2010
+1 FAMC f01
+0 NOTE ------------------------------------------------
+0 bi09 INDI
+1 NAME D /Mouse/
+1 SEX F
+1 BIRT
+2 DATE 3 APR 2010
+1 FAMC f01
+0 NOTE ------------------------------------------------
+0 bi10 INDI
+1 NAME E /Mouse/
+1 SEX M
+1 BIRT
+2 DATE 3 APR 2010
+1 FAMC f01
+0 NOTE ------------------------------------------------
+0 bi11 INDI
+1 NAME F /Mouse/
+1 SEX F
+1 BIRT
+2 DATE 3 APR 2010
+1 FAMC f01
+0 NOTE ------------------------------------------------
+0 f01 FAM
+1 HUSB bi05
+1 WIFE bi04
+1 CHIL bi06
+1 CHIL bi07
+1 CHIL bi08
+1 CHIL bi09
+1 CHIL bi10
+1 CHIL bi11
+1 MARR
+2 DATE 5 OCT 2009
+1 DIV
+2 DATE 1 AUG 2007
 0 TRLR
