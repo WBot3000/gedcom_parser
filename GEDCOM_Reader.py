@@ -34,7 +34,6 @@ try:
                         if(secondField == "HEAD" or secondField == "TRLR" or secondField == "NOTE"):
                             pass #These tags are simply for annotation, you don't need to record any data for them
                         elif(numFields == 3):
-                            thirdField: str = fields[2]
                             if(fields[2] == "INDI"):
                                 report.addToReport(current_obj) #Add current object to the map before you start with the new Individual
                                 fixedId: str = report.generate_unique_id(secondField) #Checks for duplicate IDs, #US22
