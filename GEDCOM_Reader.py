@@ -42,7 +42,7 @@ try:
                             elif(fields[2] == "FAM"):
                                 report.addToReport(current_obj) #Add current object to the map before you start with the new Family
                                 fixedId: str = report.generate_unique_id(secondField)
-                                current_obj = Family(secondField)
+                                current_obj = Family(fixedId)
                             else:
                                 raise GEDCOMReadException("Invalid tag for 0-numbered line")
                         else:
