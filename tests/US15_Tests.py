@@ -1,7 +1,7 @@
 #US15_FEWER THAN 15 SIBLINGS
 import unittest
 from classes.GEDCOM_Units import Individual, Family
-from classes.Report import Report
+from classes.GEDCOM_Reporting import Report
 
 class TestFewerThan15Siblings(unittest.TestCase):
     def test_fewer_than_15_siblings_no_issues(self):

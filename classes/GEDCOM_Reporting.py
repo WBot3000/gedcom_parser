@@ -122,6 +122,27 @@ class Report():
             if indi.birthDate and indi.deathDate and indi.deathDate < indi.birthDate:
                 self.errors.append(ReportDetail("Birth After Death", "Birth of " + indi.id + " (" + str(indi.birthDate) + ") occurs after their death (" + str(indi.deathDate) + ")" ))
 
+    
+    #US04 - Marriage before divorce
+    #Marriage should occur before divorce of spouses, and divorce can only occur after marriage
+    def marriage_before_divorce(self):
+        for fam in self.fam_map.values():
+            if fam.marriageDate and fam.divorceDate and fam.divorceDate < fam.marriageDate:
+                husband = self.indi_map.get(fam.husbandId, None)
+                wife = self.indi_map.get(fam.wifeId, None)
+                if husband is not None:
+                    self.errors.append(ReportDetail("Divorce Before Marriage", "Divorce for " + husband.id + " (" + str(fam.divorceDate) + ") occurs before their marriage (" + str(fam.marriageDate) + ")"))
+                if wife is not None:
+                    self.errors.append(ReportDetail("Divorce Before Marriage", "Divorce for " + wife.id + " (" + str(fam.divorceDate) + ") occurs before their marriage (" + str(fam.marriageDate) + ")"))
+            elif fam.divorceDate and not fam.marriageDate:
+                husband = self.indi_map.get(fam.husbandId, None)
+                wife = self.indi_map.get(fam.wifeId, None)
+                if husband is not None:
+                    self.errors.append(ReportDetail("Divorce Without Marriage", "Divorce for " + husband.id + " (" + str(fam.divorceDate) + ") occurs without a recorded marriage date."))
+                if wife is not None:
+                    self.errors.append(ReportDetail("Divorce Without Marriage", "Divorce for " + wife.id + " (" + str(fam.divorceDate) + ") occurs without a recorded marriage date."))
+
+
     #US05 - Marriage before death  
     # Marriage should occur before death of either spouse
     def marriage_before_death(self):
@@ -156,7 +177,7 @@ class Report():
                     self.anomalies.append(ReportDetail("Over 150 Years Old", f"{indi.id} is over 150 years old ({age} years old)"))
 
         
-     #US10 - Marriage after 14
+    #US10 - Marriage after 14
     # Marriage should be at least 14 years after birth of both spouses (parents must be at least 14 years old)
     def marriage_after_14(self):
         for fam in self.fam_map.values():
@@ -164,18 +185,37 @@ class Report():
             if(husband and husband.birthDate and fam.marriageDate):
                 if (fam.marriageDate.month < husband.birthDate.month or fam.marriageDate.month == husband.birthDate.month and fam.marriageDate.day < husband.birthDate.day):
                     if (fam.marriageDate.year - husband.birthDate.year - 1 < 14):
-                        self.errors.append(ReportDetail("Marriage After 14", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(husband.birthDate) + ")"))
+                        self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(husband.birthDate) + ")"))
                 else:
                     if (fam.marriageDate.year - husband.birthDate.year < 14):
-                        self.errors.append(ReportDetail("Marriage After 14", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(husband.birthDate) + ")"))
+                        self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(husband.birthDate) + ")"))
             wife = self.indi_map.get(fam.wifeId, None)
             if(wife and wife.birthDate and fam.marriageDate):
                 if (fam.marriageDate.month < wife.birthDate.month or fam.marriageDate.month == wife.birthDate.month and fam.marriageDate.day < wife.birthDate.day):
                     if (fam.marriageDate.year - wife.birthDate.year - 1 < 14):
-                        self.errors.append(ReportDetail("Marriage After 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
+                        self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
                 else:
                     if (fam.marriageDate.year - wife.birthDate.year < 14):
-                        self.errors.append(ReportDetail("Marriage After 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
+                        self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
+
+
+    #US14 - Multiple births <= 5
+    # No more than five siblings born at the same time
+    def check_multiple_births(self):
+        for fam in self.fam_map.values():
+            birth_dates = {}  # Dictionary to store birth dates and their counts
+            for child_id in fam.childIds:
+                child = self.indi_map.get(child_id, None)
+                if child and child.birthDate:
+                    birth_date = child.birthDate
+                    if birth_date in birth_dates:
+                        birth_dates[birth_date] += 1
+                    else:
+                        birth_dates[birth_date] = 1
+            for date, count in birth_dates.items():
+                if count > 5:
+                    self.errors.append(ReportDetail("Multiple Births", f"More than five siblings were born on {date} in family {fam.id}."))
+
 
     # US15 - Fewer than 15 siblings
     def fewer_than_15_siblings(self):
