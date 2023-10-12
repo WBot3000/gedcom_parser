@@ -85,13 +85,13 @@ class Report():
         elif(isinstance(unit, Individual)):
             dup_check: Individual = self.indi_map.get(unit.id, None)
             if(dup_check is not None):
-                newId: str = self.generate_unique_id(unit.id)
+                newId: str = self.check_unique_id_and_fix(unit.id)
                 unit.id = newId
             self.indi_map.update({unit.id: unit})
         elif(isinstance(unit, Family)):
             dup_check: Family = self.fam_map.get(unit.id, None)
             if(dup_check is not None):
-                newId: str = self.generate_unique_id(unit.id)
+                newId: str = self.check_unique_id_and_fix(unit.id)
                 unit.id = newId
             self.fam_map.update({unit.id: unit})
         else:
@@ -252,10 +252,9 @@ class Report():
 
 
     #US22 - Unique IDs
-    #TODO: Rename to mention checking for multiple IDs
     #This takes a passed in ID, checks if it's a duplicate, and if it is, then note it as an error and change it to make it unique
     #Right now, if the shared ID is used in a family, it will automatically assume it's meant for the first person. I don't think there's a way to account for this given the limitations of GEDCOM files
-    def generate_unique_id(self, id) -> str:
+    def check_unique_id_and_fix(self, id) -> str:
         if(id in self.indi_map or id in self.fam_map):
             self.errors.append(ReportDetail("Duplicate IDs", id + " is already used"))
             numDuplicates: int = self.duplicate_id_map.get(id, 1) #numDuplicates is 1 less than the amount of total times the ID appears in total (since the original isn't a duplicate)
