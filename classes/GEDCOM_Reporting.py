@@ -191,6 +191,30 @@ class Report():
                     if (fam.marriageDate.year - wife.birthDate.year < 14):
                         self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
 
+    #US11 - No bigamy
+    # Marriage should not occur during marriage to another spouse
+    def check_bigamy(self):
+        bigamy_true = []
+        for fam in self.fam_map.values():
+            if fam.id in bigamy_true:
+                continue
+            husband = self.indi_map.get(fam.husbandId, None)
+            wife = self.indi_map.get(fam.wifeId, None)
+            if fam.divorceDate == None and husband.deathDate == None and wife.deathDate == None:
+                if len(husband.spouseIn) > 1:
+                    for famId in husband.spouseIn:
+                        if famId != fam.id:
+                            family = self.fam_map.get(famId)
+                            if family.divorceDate == None and self.indi_map.get(family.wifeId).deathDate == None:
+                                bigamy_true.append(famId)
+                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                if len(wife.spouseIn) > 1:
+                    for famId in wife.spouseIn:
+                        if famId != fam.id:
+                            family = self.fam_map.get(famId)
+                            if family.divorceDate == None and self.indi_map.get(family.husbandId).deathDate == None:
+                                bigamy_true.append(famId)
+                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
 
     #US14 - Multiple births <= 5
     # No more than five siblings born at the same time
