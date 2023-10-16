@@ -128,31 +128,24 @@ class Report():
     def marriage_before_divorce(self):
         for fam in self.fam_map.values():
             if fam.marriageDate and fam.divorceDate and fam.divorceDate < fam.marriageDate:
-                husband = self.indi_map.get(fam.husbandId, None)
-                wife = self.indi_map.get(fam.wifeId, None)
-                if husband is not None:
-                    self.errors.append(ReportDetail("Divorce Before Marriage", "Divorce for " + husband.id + " (" + str(fam.divorceDate) + ") occurs before their marriage (" + str(fam.marriageDate) + ")"))
-                if wife is not None:
-                    self.errors.append(ReportDetail("Divorce Before Marriage", "Divorce for " + wife.id + " (" + str(fam.divorceDate) + ") occurs before their marriage (" + str(fam.marriageDate) + ")"))
+                    self.errors.append(ReportDetail("Divorce Before Marriage", "Divorce of " + fam.id + " (" + str(fam.divorceDate) + ") occurs before their marriage (" + str(fam.marriageDate) + ")"))
             elif fam.divorceDate and not fam.marriageDate:
-                husband = self.indi_map.get(fam.husbandId, None)
-                wife = self.indi_map.get(fam.wifeId, None)
-                if husband is not None:
-                    self.errors.append(ReportDetail("Divorce Without Marriage", "Divorce for " + husband.id + " (" + str(fam.divorceDate) + ") occurs without a recorded marriage date."))
-                if wife is not None:
-                    self.errors.append(ReportDetail("Divorce Without Marriage", "Divorce for " + wife.id + " (" + str(fam.divorceDate) + ") occurs without a recorded marriage date."))
+                    self.errors.append(ReportDetail("Divorce Without Marriage", "Divorce of " + fam.id + " (" + str(fam.divorceDate) + ") occurs without a recorded marriage date."))
 
 
-    #US05 - Marriage before death  
+    # US05 - Marriage before death  
     # Marriage should occur before death of either spouse
     def marriage_before_death(self):
         for fam in self.fam_map.values():
-            husband = self.indi_map.get(fam.husbandId, None)
-            if(husband and husband.deathDate and husband.deathDate < fam.marriageDate):
-                self.errors.append(ReportDetail("Marriage After Death", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs after their death (" + str(husband.deathDate) + ")"))
-            wife = self.indi_map.get(fam.wifeId, None)
-            if(wife and wife.deathDate and wife.deathDate < fam.marriageDate):
-                self.errors.append(ReportDetail("Marriage After Death", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs after their death (" + str(wife.deathDate) + ")"))
+            self.check_marriage_before_death(fam.husbandId, fam)
+            self.check_marriage_before_death(fam.wifeId, fam)
+
+    def check_marriage_before_death(self, spouse_id, family):
+        spouse = self.indi_map.get(spouse_id)
+        
+        if spouse and spouse.deathDate and spouse.deathDate < family.marriageDate:
+            error_message = f"Marriage of {family.id} ({family.marriageDate}) occurs after the death of {spouse.name} ({spouse.deathDate})"
+            self.errors.append(ReportDetail("Marriage Before Death", error_message))
 
 
     #US06 - Divorce before death
