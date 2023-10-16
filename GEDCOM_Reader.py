@@ -95,11 +95,11 @@ else:
     report.divorce_before_death() #US06
     report.check_max_age() #US07
     report.marriage_after_14() #US10
+    report.check_bigamy() #US11
     report.check_multiple_births() #US14
     report.fewer_than_15_siblings() #US15
     report.check_correct_gender_for_roles() #US21
     report.check_unique_name_and_birth_date() #US23
     report.sort_children_by_age() #US28
-
-    #Printing the report
     report.printReport()
+
