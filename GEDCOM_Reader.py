@@ -7,6 +7,12 @@ from datetime import date
 from classes.GEDCOM_Units import GEDCOMUnit, Individual, Family, GEDCOMReadException
 from classes.GEDCOM_Reporting import Report
 
+#Tags that indicate annotation. They exist to aid the reader of the file, not to add new content, so they can be skipped over
+annotationTags: list[str] = ["HEAD", "TRLR", "NOTE"]
+
+#Tags that indicate types of date values. Indicate what the date that's about to be read is meant for
+dateTags: list[str] = ["BIRT", "DEAT", "MARR", "DIV"]
+
 #Stores all report data
 report: Report = Report()
 
@@ -31,18 +37,17 @@ try:
                 secondField: str = fields[1]
                 match(fields[0]) : #The number of the line
                     case "0":
-                        if(secondField == "HEAD" or secondField == "TRLR" or secondField == "NOTE"):
+                        if(secondField in annotationTags):
                             pass #These tags are simply for annotation, you don't need to record any data for them
                         elif(numFields == 3):
-                            thirdField: str = fields[2]
                             if(fields[2] == "INDI"):
                                 report.addToReport(current_obj) #Add current object to the map before you start with the new Individual
-                                fixedId: str = report.generate_unique_id(secondField) #Checks for duplicate IDs, #US22
+                                fixedId: str = report.check_unique_id_and_fix(secondField) #Checks for duplicate IDs, #US22
                                 current_obj = Individual(fixedId)
                             elif(fields[2] == "FAM"):
                                 report.addToReport(current_obj) #Add current object to the map before you start with the new Family
-                                fixedId: str = report.generate_unique_id(secondField)
-                                current_obj = Family(secondField)
+                                fixedId: str = report.check_unique_id_and_fix(secondField)
+                                current_obj = Family(fixedId)
                             else:
                                 raise GEDCOMReadException("Invalid tag for 0-numbered line")
                         else:
@@ -51,7 +56,7 @@ try:
                         #Check to make sure object exists, then check if line is specifying a type of date or just a standard field
                         if(current_obj is None):
                             raise GEDCOMReadException("No GEDCOM Unit (Individual or Family) to give field")
-                        elif(secondField == "BIRT" or secondField == "DEAT" or secondField == "MARR" or secondField == "DIV"):
+                        elif(secondField in dateTags):
                             readingDateOf = secondField
                         else:
                             current_obj.readDataFromFields(fields) #TODO: Change from taking in fields to taking in tag and argument?
@@ -81,21 +86,20 @@ except OSError as e:
     print("OS Error encountered: " + os.strerror(e.errno))
 except Exception as e:
     print("Error encountered: " + os.strerror(e.errno))
+else:
+    #Checks
+    report.birth_before_marriage() #US02
+    report.birth_before_death() #US03
+    report.marriage_before_divorce() #US04
+    report.marriage_before_death() #US05
+    report.divorce_before_death() #US06
+    report.check_max_age() #US07
+    report.marriage_after_14() #US10
+    report.check_bigamy() #US11
+    report.check_multiple_births() #US14
+    report.fewer_than_15_siblings() #US15
+    report.check_correct_gender_for_roles() #US21
+    report.check_unique_name_and_birth_date() #US23
+    report.sort_children_by_age() #US28
+    report.printReport()
 
-#Checks
-report.birth_before_marriage() #US02
-report.birth_before_death() #US03
-report.marriage_before_divorce() #US04
-report.marriage_before_death() #US05
-report.divorce_before_death() #US06
-report.check_max_age() #US07
-report.marriage_after_14() #US10
-report.check_bigamy() #US11
-report.check_multiple_births() #US14
-report.fewer_than_15_siblings() #US15
-report.check_correct_gender_for_roles() #US21
-report.check_unique_name_and_birth_date() #US23
-report.sort_children_by_age() #US28
-
-#Printing the report
-report.printReport()

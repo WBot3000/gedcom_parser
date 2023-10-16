@@ -5,9 +5,9 @@ from classes.GEDCOM_Units import GEDCOMUnit, Individual, Family
 class US22_Tests(unittest.TestCase):
     def test_no_duplicates(self):
         testReport: Report = Report()
-        idA = testReport.generate_unique_id("a")
-        idB = testReport.generate_unique_id("b")
-        idC = testReport.generate_unique_id("c")
+        idA = testReport.check_unique_id_and_fix("a")
+        idB = testReport.check_unique_id_and_fix("b")
+        idC = testReport.check_unique_id_and_fix("c")
         indiA: Individual = Individual(idA)
         indiB: Individual = Individual(idB)
         indiC: Individual = Individual(idC)
@@ -19,15 +19,15 @@ class US22_Tests(unittest.TestCase):
 
     def test_single_duplicate(self):
         testReport: Report = Report()
-        idA1 = testReport.generate_unique_id("a")
+        idA1 = testReport.check_unique_id_and_fix("a")
         indiA1: Individual = Individual(idA1)
         testReport.addToReport(indiA1)
 
-        idA2 = testReport.generate_unique_id("a")
+        idA2 = testReport.check_unique_id_and_fix("a")
         indiA2: Individual = Individual(idA2)
         testReport.addToReport(indiA2)
 
-        idC = testReport.generate_unique_id("c")
+        idC = testReport.check_unique_id_and_fix("c")
         indiC: Individual = Individual(idC)
         testReport.addToReport(indiC)
 
@@ -37,15 +37,15 @@ class US22_Tests(unittest.TestCase):
 
     def test_multiple_duplicates(self):
         testReport: Report = Report()
-        idA1 = testReport.generate_unique_id("a")
+        idA1 = testReport.check_unique_id_and_fix("a")
         indiA1: Individual = Individual(idA1)
         testReport.addToReport(indiA1)
 
-        idA2 = testReport.generate_unique_id("a")
+        idA2 = testReport.check_unique_id_and_fix("a")
         indiA2: Individual = Individual(idA2)
         testReport.addToReport(indiA2)
 
-        idA3 = testReport.generate_unique_id("a")
+        idA3 = testReport.check_unique_id_and_fix("a")
         indiA3: Individual = Individual(idA3)
         testReport.addToReport(indiA3)
 
@@ -56,11 +56,11 @@ class US22_Tests(unittest.TestCase):
 
     def test_indi_and_fam_duplicate(self):
         testReport: Report = Report()
-        idIndi = testReport.generate_unique_id("a")
+        idIndi = testReport.check_unique_id_and_fix("a")
         indiA: Individual = Individual(idIndi)
         testReport.addToReport(indiA)
 
-        idFam = testReport.generate_unique_id("a")
+        idFam = testReport.check_unique_id_and_fix("a")
         famA: Family = Family(idFam)
         testReport.addToReport(famA)
 
@@ -68,8 +68,8 @@ class US22_Tests(unittest.TestCase):
         self.assertEqual(idFam, "a (1)", "New ID for famA not created correctly")
 
     
-    #While generate_unique_id should always be used to create a new ID for a report, this failsafe should be useful
-    def test_ignoring_generate_unique_id(self):
+    #While check_unique_id_and_fix should always be used to create a new ID for a report, this failsafe should be useful
+    def test_ignoring_check_unique_id_and_fix(self):
         testReport: Report = Report()
         indiA1: Individual = Individual("a")
         testReport.addToReport(indiA1)
