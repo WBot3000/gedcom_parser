@@ -24,6 +24,7 @@ class US05_Tests(unittest.TestCase):
         testReport.addToReport(family)
 
         testReport.marriage_before_death()
+        self.assertEqual(testReport.errors[0].detailType, "Marriage After Death")
         self.assertEqual(testReport.errors[0].message, "Marriage of F1 (2020-03-10) occurs after the death of Jon Snow (2018-02-05)")
 
     def test_death_before_marriage_no_error(self):

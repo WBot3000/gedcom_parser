@@ -145,7 +145,7 @@ class Report():
         
         if spouse and spouse.deathDate and spouse.deathDate < family.marriageDate:
             error_message = f"Marriage of {family.id} ({family.marriageDate}) occurs after the death of {spouse.name} ({spouse.deathDate})"
-            self.errors.append(ReportDetail("Marriage Before Death", error_message))
+            self.errors.append(ReportDetail("Marriage After Death", error_message))
 
 
     #US06 - Divorce before death
@@ -156,9 +156,9 @@ class Report():
                 husband = self.indi_map.get(fam.husbandId, None)
                 wife = self.indi_map.get(fam.wifeId, None)
                 if (husband and husband.deathDate and fam.divorceDate > husband.deathDate):
-                    self.errors.append(ReportDetail("Divorce Before Death", f"Divorce for family {fam.id} ({fam.divorceDate}) occurs after the death of the husband ({husband.deathDate})"))
+                    self.errors.append(ReportDetail("Divorce After Death", f"Divorce for family {fam.id} ({fam.divorceDate}) occurs after the death of the husband ({husband.deathDate})"))
                 if (wife and wife.deathDate and fam.divorceDate > wife.deathDate):
-                    self.errors.append(ReportDetail("Divorce Before Death", f"Divorce for family {fam.id} ({fam.divorceDate}) occurs after the death of the wife ({wife.deathDate})"))
+                    self.errors.append(ReportDetail("Divorce Afte Death", f"Divorce for family {fam.id} ({fam.divorceDate}) occurs after the death of the wife ({wife.deathDate})"))
 
 
     #US07 - Less than 150 years old
@@ -179,18 +179,18 @@ class Report():
             if(husband and husband.birthDate and fam.marriageDate):
                 if (fam.marriageDate.month < husband.birthDate.month or fam.marriageDate.month == husband.birthDate.month and fam.marriageDate.day < husband.birthDate.day):
                     if (fam.marriageDate.year - husband.birthDate.year - 1 < 14):
-                        self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(husband.birthDate) + ")"))
+                        self.anomalies.append(ReportDetail("Marriage Before 14", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(husband.birthDate) + ")"))
                 else:
                     if (fam.marriageDate.year - husband.birthDate.year < 14):
-                        self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(husband.birthDate) + ")"))
+                        self.anomalies.append(ReportDetail("Marriage Before 14", "Marriage for " + husband.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(husband.birthDate) + ")"))
             wife = self.indi_map.get(fam.wifeId, None)
             if(wife and wife.birthDate and fam.marriageDate):
                 if (fam.marriageDate.month < wife.birthDate.month or fam.marriageDate.month == wife.birthDate.month and fam.marriageDate.day < wife.birthDate.day):
                     if (fam.marriageDate.year - wife.birthDate.year - 1 < 14):
-                        self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
+                        self.anomalies.append(ReportDetail("Marriage Before 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
                 else:
                     if (fam.marriageDate.year - wife.birthDate.year < 14):
-                        self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
+                        self.anomalies.append(ReportDetail("Marriage Before 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
 
     #Calculate divorce date
     def get_divorceDate (self, family):
@@ -230,19 +230,19 @@ class Report():
                         if divorceDate != None and divorceDateNew != None:
                             if marriageDate < marriageDateNew and divorceDate > marriageDateNew:
                                 bigamy_true.append(famId)
-                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                                self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
                             elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
                                 bigamy_true.append(famId)
-                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                                self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDateNew == None and divorceDate > marriageDateNew:
                             bigamy_true.append(famId)
-                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDate == None and marriageDate < divorceDateNew:
                             bigamy_true.append(famId)
-                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDate == None and divorceDateNew == None:
                             bigamy_true.append(famId)
-                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
             if len(wife.spouseIn) > 1:
                 for famId in wife.spouseIn:
                     if famId != fam.id:
@@ -252,19 +252,19 @@ class Report():
                         if divorceDate != None and divorceDateNew != None:
                             if marriageDate < marriageDateNew and divorceDate > marriageDateNew:
                                 bigamy_true.append(famId)
-                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                                self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
                             elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
                                 bigamy_true.append(famId)
-                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                                self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDateNew == None and divorceDate > marriageDateNew:
                             bigamy_true.append(famId)
-                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDate == None and marriageDate < divorceDateNew:
                             bigamy_true.append(famId)
-                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDate == None and divorceDateNew == None:
                             bigamy_true.append(famId)
-                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
 
     #US14 - Multiple births <= 5
     # No more than five siblings born at the same time

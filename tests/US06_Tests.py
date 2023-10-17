@@ -24,6 +24,7 @@ class US06_Tests(unittest.TestCase):
         testReport.addToReport(family)
 
         testReport.divorce_before_death()
+        self.assertEqual(testReport.errors[0].detailType, "Divorce After Death")
         self.assertEqual(testReport.errors[0].message, "Divorce for family F1 (2020-03-10) occurs after the death of the husband (2018-02-05)")
 
     def test_death_before_divorce_no_error(self):
