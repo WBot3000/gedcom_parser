@@ -240,10 +240,10 @@ class Report():
                             elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
                                 bigamy_true.append(famId)
                                 self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-                        elif marriageDate > marriageDateNew and divorceDateNew == None:
+                        elif divorceDateNew == None and divorceDate > marriageDateNew:
                             bigamy_true.append(famId)
                             self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-                        elif marriageDate < marriageDateNew and divorceDate == None:
+                        elif divorceDate == None and marriageDate < divorceDateNew:
                             bigamy_true.append(famId)
                             self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDate == None and divorceDateNew == None:
@@ -262,10 +262,10 @@ class Report():
                             elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
                                 bigamy_true.append(famId)
                                 self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
-                        elif marriageDate > marriageDateNew and divorceDateNew == None:
+                        elif divorceDateNew == None and divorceDate > marriageDateNew:
                             bigamy_true.append(famId)
                             self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
-                        elif marriageDate < marriageDateNew and divorceDate == None:
+                        elif divorceDate == None and marriageDate < divorceDateNew:
                             bigamy_true.append(famId)
                             self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDate == None and divorceDateNew == None:
