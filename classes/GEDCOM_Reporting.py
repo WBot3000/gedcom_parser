@@ -331,6 +331,41 @@ class Report():
                 self.anomalies.append(ReportDetail("Too Many Siblings", error_message))
 
     
+    #US16 - Male last names
+    #Makes sure that all male members of a family share the same last name
+    def get_surname(self, name: str):
+        surnameStartPos: int = name.find("/")
+        if(surnameStartPos == -1): #No slashes present, so no surname. Just return the empty string.
+            return ""
+        surnameEndPos: int = name.find("/", surnameStartPos+1) #Find the next slash after the previous one
+        if(surnameEndPos == -1): #If that's the only slash present, then just assume that the last name is until the end of the name
+            surnameEndPos = len(name)
+        if(surnameStartPos+1 == surnameEndPos): #Have encountered two slashes next to each other, this name is empty
+            return ""
+        else: #Assumes that there's at least one character in the name, which is why the previous check is needed
+            return name[surnameStartPos+1:surnameEndPos]
+
+
+    def check_family_male_surnames(self):
+        for fam in self.fam_map.values():
+            male_surnames: list[str] = []
+            #First, check the husband of the family
+            husband: Individual = self.indi_map.get(fam.husbandId, None)
+            if(husband and husband.name):
+                #Since the husband is always the first person checked, just put their last name in automatically
+                male_surnames = [self.get_surname(husband.name)]
+            for id in fam.childIds:
+                child: Individual = self.indi_map.get(id, None)
+                if(child and child.name and child.sex == "M"):
+                    child_surname: str = self.get_surname(child.name)
+                    if(child_surname not in male_surnames):
+                        male_surnames.append(child_surname)
+            if(len(male_surnames) > 1):
+                self.anomalies.append(ReportDetail("Differing Male Surnames", f"Males in family {fam.id} have several different surnames {male_surnames}")) 
+                
+                
+
+
     #US21 - Correct Gender of Role
     def check_correct_gender_for_roles(self):
         # Iterate through all families in the GEDCOM file

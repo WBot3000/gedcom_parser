@@ -99,6 +99,7 @@ else:
     report.check_parent_child_age_difference() #US12
     report.check_multiple_births() #US14
     report.fewer_than_15_siblings() #US15
+    report.check_family_male_surnames() #US16
     report.check_correct_gender_for_roles() #US21
     report.check_unique_name_and_birth_date() #US23
     report.sort_children_by_age() #US28
