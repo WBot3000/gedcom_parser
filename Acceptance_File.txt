@@ -57,120 +57,124 @@
 0 bi04 INDI
 1 NAME Minnie /Mouse/
 1 SEX F
+1 BIRT
+2 DATE 18 NOV 1928
 1 FAMS f02
 0 NOTE ------------------------------------------------
 0 bi05 INDI
 1 NAME Mickey /Mouse/
 1 SEX M
+1 BIRT
+2 DATE 18 NOV 1928
 1 FAMS f02
 0 NOTE ------------------------------------------------
 0 sib01 INDI
-1 NAME A /Mouse/
+1 NAME Andy /Mouse/
 1 SEX M
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib02 INDI
-1 NAME B /Mouse/
+1 NAME Bella /Mouse/
 1 SEX F
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib03 INDI
-1 NAME C /Mouse/
+1 NAME Charles /Mouse/
 1 SEX M
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib04 INDI
-1 NAME D /Mouse/
+1 NAME Diana /Mouse/
 1 SEX F
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib05 INDI
-1 NAME E /Mouse/
+1 NAME Eric /Muse/
 1 SEX M
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib06 INDI
-1 NAME F /Mouse/
+1 NAME Flo /Mouse/
 1 SEX F
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib07 INDI
-1 NAME G /Mouse/
+1 NAME George /Mouse/
 1 SEX M
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib08 INDI
-1 NAME H /Mouse/
+1 NAME Helen /Mouse/
 1 SEX F
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib09 INDI
-1 NAME I /Mouse/
+1 NAME Iggy /Mouse/
 1 SEX M
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib10 INDI
-1 NAME J /Mouse/
+1 NAME Janet /Mouse/
 1 SEX F
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib11 INDI
-1 NAME K /Mouse/
+1 NAME Kevin /Mouse/
 1 SEX M
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib12 INDI
-1 NAME L /Mouse/
+1 NAME Loretta /Mouse/
 1 SEX F
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib13 INDI
-1 NAME M /Mouse/
+1 NAME Mark /Moose/
 1 SEX M
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib14 INDI
-1 NAME N /Mouse/
+1 NAME Nora /Mouse/
 1 SEX F
 1 BIRT
 2 DATE 14 JUN 2017
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib15 INDI
-1 NAME O /Mouse/
+1 NAME Oliver /Mouse/
 1 SEX M
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib16 INDI
-1 NAME P /Mouse/
+1 NAME Petunia /Mouse/
 1 SEX F
 1 BIRT
 2 DATE 5 MAR 2016
