@@ -152,12 +152,13 @@ class Report():
     # Divorce can only occur before death of both spouses
     def divorce_before_death(self):
         for fam in self.fam_map.values():
-            husband = self.indi_map.get(fam.husbandId, None)
-            wife = self.indi_map.get(fam.wifeId, None)
-            
-            if (husband and husband.deathDate) and (wife and wife.deathDate) and fam.divorceDate:
-                if fam.divorceDate > husband.deathDate and fam.divorceDate > wife.deathDate:
-                    self.errors.append(ReportDetail("Divorce After Death", f"Divorce for family {fam.id} ({(fam.divorceDate)}) occurs after the death of the husband ({str(husband.deathDate)}) and the wife ({str(wife.deathDate)})"))
+            if fam.divorceDate:
+                husband = self.indi_map.get(fam.husbandId, None)
+                wife = self.indi_map.get(fam.wifeId, None)
+                if (husband and husband.deathDate and fam.divorceDate > husband.deathDate):
+                    self.errors.append(ReportDetail("Divorce Before Death", f"Divorce for family {fam.id} ({fam.divorceDate}) occurs after the death of the husband ({husband.deathDate})"))
+                if (wife and wife.deathDate and fam.divorceDate > wife.deathDate):
+                    self.errors.append(ReportDetail("Divorce Before Death", f"Divorce for family {fam.id} ({fam.divorceDate}) occurs after the death of the wife ({wife.deathDate})"))
 
 
     #US07 - Less than 150 years old
@@ -167,7 +168,7 @@ class Report():
             if(indi.birthDate):
                 age: int = indi.calculateAge()
                 if(age > 150):
-                    self.anomalies.append(ReportDetail("Over 150 Years Old", f"{indi.id} is over 150 years old ({age} years old)"))
+                    self.errors.append(ReportDetail("Over 150 Years Old", f"{indi.id} is over 150 years old ({age} years old)"))
 
         
     #US10 - Marriage after 14
@@ -207,14 +208,14 @@ class Report():
                             family = self.fam_map.get(famId)
                             if family.divorceDate == None and self.indi_map.get(family.wifeId).deathDate == None:
                                 bigamy_true.append(famId)
-                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                                self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
                 if len(wife.spouseIn) > 1:
                     for famId in wife.spouseIn:
                         if famId != fam.id:
                             family = self.fam_map.get(famId)
                             if family.divorceDate == None and self.indi_map.get(family.husbandId).deathDate == None:
                                 bigamy_true.append(famId)
-                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                                self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
 
     #US14 - Multiple births <= 5
     # No more than five siblings born at the same time
@@ -231,7 +232,7 @@ class Report():
                         birth_dates[birth_date] = 1
             for date, count in birth_dates.items():
                 if count > 5:
-                    self.errors.append(ReportDetail("Multiple Births", f"More than five siblings were born on {date} in family {fam.id}."))
+                    self.anomalies.append(ReportDetail("Multiple Births", f"More than five siblings were born on {date} in family {fam.id}."))
 
 
     # US15 - Fewer than 15 siblings
@@ -243,7 +244,7 @@ class Report():
             # If there are 15 or more children, add an error to the report
             # This means that the family has too many siblings
                 error_message = f"Family {fam.id} has 15 or more children"
-                self.errors.append(ReportDetail("Too Many Siblings", error_message))
+                self.anomalies.append(ReportDetail("Too Many Siblings", error_message))
 
     
     #US21 - Correct Gender of Role
