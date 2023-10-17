@@ -198,6 +198,24 @@ class Report():
                     if (fam.marriageDate.year - wife.birthDate.year < 14):
                         self.errors.append(ReportDetail("Marriage Before 14", "Marriage for " + wife.id + " (" +  str(fam.marriageDate) + ") occurs before 14 (" + str(wife.birthDate) + ")"))
 
+    #Calculate divorce date
+    def get_divorceDate (self, family):
+        husband = self.indi_map.get(family.husbandId, None)
+        wife = self.indi_map.get(family.wifeId, None)
+        if family.divorceDate:
+            divorceDate = family.divorceDate
+        elif husband.deathDate and wife.deathDate and husband.deathDate > wife.deathDate:
+            divorceDate = wife.deathDate
+        elif husband.deathDate and wife.deathDate and wife.deathDate > husband.deathDate:
+            divorceDate = husband.deathDate
+        elif husband.deathDate and wife.deathDate == None:
+            divorceDate = husband.deathDate
+        elif wife.deathDate and husband.deathDate == None:
+            divorceDate = wife.deathDate
+        else:
+            divorceDate = None
+        return divorceDate
+
     #US11 - No bigamy
     # Marriage should not occur during marriage to another spouse
     def check_bigamy(self):
@@ -207,21 +225,52 @@ class Report():
                 continue
             husband = self.indi_map.get(fam.husbandId, None)
             wife = self.indi_map.get(fam.wifeId, None)
-            if fam.divorceDate == None and husband.deathDate == None and wife.deathDate == None:
-                if len(husband.spouseIn) > 1:
-                    for famId in husband.spouseIn:
-                        if famId != fam.id:
-                            family = self.fam_map.get(famId)
-                            if family.divorceDate == None and self.indi_map.get(family.wifeId).deathDate == None:
+            marriageDate = fam.marriageDate
+            divorceDate = self.get_divorceDate (fam)
+            if len(husband.spouseIn) > 1:
+                for famId in husband.spouseIn:
+                    if famId != fam.id:
+                        family = self.fam_map.get(famId)
+                        marriageDateNew = family.marriageDate
+                        divorceDateNew = self.get_divorceDate(family)
+                        if divorceDate != None and divorceDateNew != None:
+                            if marriageDate < marriageDateNew and divorceDate > marriageDateNew:
                                 bigamy_true.append(famId)
                                 self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-                if len(wife.spouseIn) > 1:
-                    for famId in wife.spouseIn:
-                        if famId != fam.id:
-                            family = self.fam_map.get(famId)
-                            if family.divorceDate == None and self.indi_map.get(family.husbandId).deathDate == None:
+                            elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
+                                bigamy_true.append(famId)
+                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                        elif marriageDate > marriageDateNew and divorceDateNew == None:
+                            bigamy_true.append(famId)
+                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                        elif marriageDate < marriageDateNew and divorceDate == None:
+                            bigamy_true.append(famId)
+                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                        elif divorceDate == None and divorceDateNew == None:
+                            bigamy_true.append(famId)
+                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+            if len(wife.spouseIn) > 1:
+                for famId in wife.spouseIn:
+                    if famId != fam.id:
+                        family = self.fam_map.get(famId)
+                        marriageDateNew = family.marriageDate
+                        divorceDateNew = self.get_divorceDate(family)
+                        if divorceDate != None and divorceDateNew != None:
+                            if marriageDate < marriageDateNew and divorceDate > marriageDateNew:
                                 bigamy_true.append(famId)
                                 self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                            elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
+                                bigamy_true.append(famId)
+                                self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                        elif marriageDate > marriageDateNew and divorceDateNew == None:
+                            bigamy_true.append(famId)
+                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                        elif marriageDate < marriageDateNew and divorceDate == None:
+                            bigamy_true.append(famId)
+                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                        elif divorceDate == None and divorceDateNew == None:
+                            bigamy_true.append(famId)
+                            self.errors.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
 
     #US14 - Multiple births <= 5
     # No more than five siblings born at the same time
