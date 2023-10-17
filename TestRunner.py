@@ -4,9 +4,13 @@ import unittest
 from tests.US01_Tests import US01_Tests as us01
 from tests.US02_Tests import US02_Tests as us02
 from tests.US03_Tests import US03_Tests as us03
+from tests.US04_Tests import US04_Tests as us04
+from tests.US05_Tests import US05_Tests as us05 
+from tests.US06_Tests import US06_Tests as us06
 from tests.US07_Tests import US07_Tests as us07
 from tests.US10_Tests import US10_Tests as us10
 from tests.US11_Tests import US11_Tests as us11
+from tests.US14_Tests import US14_Tests as us14
 from tests.US15_Tests import TestFewerThan15Siblings as us15
 from tests.US21_Tests import TestCheckCorrectGenderForRoles as us21
 from tests.US22_Tests import US22_Tests as us22
@@ -16,8 +20,8 @@ from tests.US42_Tests import US42_Tests as us42
 
 #Index of the array is the number of the corresponding user story minus 1
 #Fill this out as test case files are written
-testCaseClassArray = [us01, us02, us03, None, None, None, us07, None, None, us10, 
-                      us11, None, None, None, us15, None, None, None, None, None, 
+testCaseClassArray = [us01, us02, us03, us04, us05, us06, us07, None, None, us10, 
+                      us11, None, None, us14, us15, None, None, None, None, None, 
                       us21, us22, us23, None, None, None, None, us28, None, None,
                       None, None, None, None, None, None, None, None, None, None,
                       None, us42]
