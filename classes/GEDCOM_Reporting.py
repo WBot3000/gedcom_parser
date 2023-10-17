@@ -266,6 +266,41 @@ class Report():
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
 
+
+    #US12 - Parents not too old
+    # This checks all of the families and compares the ages of both parents to their 
+    def check_parent_child_age_difference(self):
+        for fam in self.fam_map.values():
+            #Store the information and age for the kids in the array so all that doesn't have to be fetched twice (once for father, once for mother)
+            kidsInfo: list[str] = []
+            kidsAges: list[int] = []
+            if(len(fam.childIds) == 0 or (fam.husbandId is None and fam.wifeId is None)): #Don't bother if there's no children or no parents
+                continue
+            else:
+                kidsInfo = list(filter(lambda kid: kid.birthDate is not None, map(lambda kidId: self.indi_map.get(kidId, None), fam.childIds))) #Get the information of all the kids, and remove the ones without birthdays
+                kidsAges = list(map(lambda kid: kid.calculateAge(), kidsInfo)) #Get all fo their ages
+            dadInfo: Individual = self.indi_map.get(fam.husbandId, None)
+            if(dadInfo and dadInfo.birthDate):
+                dadTooOldFor: list[str] = [] #The ids of all the kids that the dad is more than 80 years older than
+                dadAge: int = dadInfo.calculateAge()
+                for i in range(len(kidsInfo)):
+                    if dadAge - kidsAges[i] > 80: #Father is over 80 years older than this child
+                        dadTooOldFor.append(kidsInfo[i].id)
+                if(len(dadTooOldFor) > 0):
+                    self.anomalies.append(ReportDetail("Parent Too Old", f"Father in family {fam.id} is over 80 years older than one or more of his children {dadTooOldFor}"))
+            momInfo: Individual = self.indi_map.get(fam.wifeId, None)
+            if(momInfo and momInfo.birthDate):
+                momTooOldFor: list[str] = [] #The ids of all the kids that the mom is more than 60 years older than
+                momAge: int = momInfo.calculateAge()
+                for i in range(len(kidsInfo)):
+                    if momAge - kidsAges[i] > 60: #Mom is over 60 years older than this child
+                        momTooOldFor.append(kidsInfo[i].id)
+                if(len(momTooOldFor) > 0):
+                    self.anomalies.append(ReportDetail("Parent Too Old", f"Mother in family {fam.id} is over 60 years older than one or more of her children {momTooOldFor}"))
+            
+            
+
+
     #US14 - Multiple births <= 5
     # No more than five siblings born at the same time
     def check_multiple_births(self):
