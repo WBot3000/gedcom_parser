@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from prettytable import PrettyTable
 from classes.GEDCOM_Units import GEDCOMUnit, Individual, Family, GEDCOMReadException
 
@@ -456,6 +456,33 @@ class Report():
             sorted_siblings = sorted(fam.childIds, key=age_sorting_fn)
             fam.childIds = sorted_siblings
 
+    #US35 - List recent births 
+    def list_recent_births(self, days_threshold=30):
+        recent_births = []
+        current_date = datetime.now()
+        threshold_date = current_date - timedelta(days=days_threshold)
+
+        for individual_id, individual in self.individuals.items():
+            if individual.birth_date is not None and individual.birth_date >= threshold_date:
+                recent_births.append(individual)
+                
+        # Sort recent_births by birth date
+        recent_births.sort(key=lambda x: x.birth_date)
+        return recent_births
+
+    #US36 - List recent deaths
+    def list_recent_deaths(self, days_threshold=30):
+        recent_deaths = []
+        current_date = datetime.now()
+        threshold_date = current_date - timedelta(days=days_threshold)
+
+        for individual_id, individual in self.individuals.items():
+            if individual.death_date is not None and individual.death_date >= threshold_date:
+                recent_deaths.append(individual)
+                
+        # Sort recent_deaths by death date
+        recent_deaths.sort(key=lambda x: x.death_date)
+        return recent_deaths
 
     #US42 - Reject invalid dates
     #Wrapper around conversion function. Returns None if an error occurs
