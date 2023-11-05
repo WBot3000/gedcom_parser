@@ -104,14 +104,8 @@ class Individual(GEDCOMUnit):
             rowData.append("NA")
         else:
             rowData.append(self.childIn)
-        #Getting string data of all spouse IDs
-        spouseStr: str = "["
-        for i in range(len(self.spouseIn)):
-            spouseStr = spouseStr + self.spouseIn[i]
-            if(i < len(self.spouseIn) - 1):
-                spouseStr = spouseStr + ", "
-        spouseStr = spouseStr + "]"
-        rowData.append(spouseStr)
+        #Getting string data of all family IDs the user is a spouse in
+        rowData.append(str(self.spouseIn))
         return rowData
 
 
@@ -187,13 +181,7 @@ class Family(GEDCOMUnit):
                 wifeData: Individual = indiLookup.get(self.wifeId, None)
                 rowData.append("NA" if (wifeData is None or wifeData.name is None) else wifeData.name)
         #Getting string data of all child IDs
-        childStr: str = "["
-        for i in range(len(self.childIds)):
-            childStr = childStr + self.childIds[i]
-            if(i < len(self.childIds) - 1):
-                childStr = childStr + ", "
-        childStr = childStr + "]"
-        rowData.append(childStr)
+        rowData.append(str(self.childIds))
         return rowData
     
 

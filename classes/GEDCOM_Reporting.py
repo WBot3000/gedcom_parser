@@ -266,6 +266,41 @@ class Report():
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
 
+
+    #US12 - Parents not too old
+    # This checks all of the families and compares the ages of both parents to their 
+    def check_parent_child_age_difference(self):
+        for fam in self.fam_map.values():
+            #Store the information and age for the kids in the array so all that doesn't have to be fetched twice (once for father, once for mother)
+            kidsInfo: list[str] = []
+            kidsAges: list[int] = []
+            if(len(fam.childIds) == 0 or (fam.husbandId is None and fam.wifeId is None)): #Don't bother if there's no children or no parents
+                continue
+            else:
+                kidsInfo = list(filter(lambda kid: kid.birthDate is not None, map(lambda kidId: self.indi_map.get(kidId, None), fam.childIds))) #Get the information of all the kids, and remove the ones without birthdays
+                kidsAges = list(map(lambda kid: kid.calculateAge(), kidsInfo)) #Get all fo their ages
+            dadInfo: Individual = self.indi_map.get(fam.husbandId, None)
+            if(dadInfo and dadInfo.birthDate):
+                dadTooOldFor: list[str] = [] #The ids of all the kids that the dad is more than 80 years older than
+                dadAge: int = dadInfo.calculateAge()
+                for i in range(len(kidsInfo)):
+                    if dadAge - kidsAges[i] > 80: #Father is over 80 years older than this child
+                        dadTooOldFor.append(kidsInfo[i].id)
+                if(len(dadTooOldFor) > 0):
+                    self.anomalies.append(ReportDetail("Parent Too Old", f"Father in family {fam.id} is over 80 years older than one or more of his children {dadTooOldFor}"))
+            momInfo: Individual = self.indi_map.get(fam.wifeId, None)
+            if(momInfo and momInfo.birthDate):
+                momTooOldFor: list[str] = [] #The ids of all the kids that the mom is more than 60 years older than
+                momAge: int = momInfo.calculateAge()
+                for i in range(len(kidsInfo)):
+                    if momAge - kidsAges[i] > 60: #Mom is over 60 years older than this child
+                        momTooOldFor.append(kidsInfo[i].id)
+                if(len(momTooOldFor) > 0):
+                    self.anomalies.append(ReportDetail("Parent Too Old", f"Mother in family {fam.id} is over 60 years older than one or more of her children {momTooOldFor}"))
+            
+            
+
+
     #US14 - Multiple births <= 5
     # No more than five siblings born at the same time
     def check_multiple_births(self):
@@ -296,6 +331,41 @@ class Report():
                 self.anomalies.append(ReportDetail("Too Many Siblings", error_message))
 
     
+    #US16 - Male last names
+    #Makes sure that all male members of a family share the same last name
+    def get_surname(self, name: str):
+        surnameStartPos: int = name.find("/")
+        if(surnameStartPos == -1): #No slashes present, so no surname. Just return the empty string.
+            return ""
+        surnameEndPos: int = name.find("/", surnameStartPos+1) #Find the next slash after the previous one
+        if(surnameEndPos == -1): #If that's the only slash present, then just assume that the last name is until the end of the name
+            surnameEndPos = len(name)
+        if(surnameStartPos+1 == surnameEndPos): #Have encountered two slashes next to each other, this name is empty
+            return ""
+        else: #Assumes that there's at least one character in the name, which is why the previous check is needed
+            return name[surnameStartPos+1:surnameEndPos]
+
+
+    def check_family_male_surnames(self):
+        for fam in self.fam_map.values():
+            male_surnames: list[str] = []
+            #First, check the husband of the family
+            husband: Individual = self.indi_map.get(fam.husbandId, None)
+            if(husband and husband.name):
+                #Since the husband is always the first person checked, just put their last name in automatically
+                male_surnames = [self.get_surname(husband.name)]
+            for id in fam.childIds:
+                child: Individual = self.indi_map.get(id, None)
+                if(child and child.name and child.sex == "M"):
+                    child_surname: str = self.get_surname(child.name)
+                    if(child_surname not in male_surnames):
+                        male_surnames.append(child_surname)
+            if(len(male_surnames) > 1):
+                self.anomalies.append(ReportDetail("Differing Male Surnames", f"Males in family {fam.id} have several different surnames {male_surnames}")) 
+                
+                
+
+
     #US21 - Correct Gender of Role
     def check_correct_gender_for_roles(self):
         # Iterate through all families in the GEDCOM file
