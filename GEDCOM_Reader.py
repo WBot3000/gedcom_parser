@@ -103,5 +103,7 @@ else:
     report.check_correct_gender_for_roles() #US21
     report.check_unique_name_and_birth_date() #US23
     report.sort_children_by_age() #US28
+    report.list_recent_births() #35
+    report.list_recent_deaths() #36
     report.printReport()
 
