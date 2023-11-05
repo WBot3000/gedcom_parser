@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from datetime import date, datetime
+from datetime import datetime, date, timedelta
 from prettytable import PrettyTable
 from classes.GEDCOM_Units import GEDCOMUnit, Individual, Family, GEDCOMReadException
 
