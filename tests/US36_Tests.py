@@ -10,12 +10,12 @@ class TestRecentDeaths(unittest.TestCase):
         report = Report()
 
         # Create individuals with death dates within the threshold
-        recent_death1 = self.create_individual('I1', 'John Doe', 'M', self.today - timedelta(days=15))
-        recent_death2 = self.create_individual('I2', 'Jane Smith', 'F', self.today - timedelta(days=10))
-        recent_death3 = self.create_individual('I3', 'Tom Brown', 'M', self.today - timedelta(days=25))
+        recent_death1 = self.create_individual('I1', 'John Doe', 'M', (datetime.today() - timedelta(days=15)).date())
+        recent_death2 = self.create_individual('I2', 'Jane Smith', 'F', (datetime.today() - timedelta(days=10)).date())
+        recent_death3 = self.create_individual('I3', 'Tom Brown', 'M', (datetime.today() - timedelta(days=25)).date())
 
         # Add individuals to the report
-        report.individuals = {
+        report.indi_map = {
             'I1': recent_death1,
             'I2': recent_death2,
             'I3': recent_death3,
@@ -26,11 +26,8 @@ class TestRecentDeaths(unittest.TestCase):
 
         # Assert that the recent deaths field is as expected
         self.assertEqual(len(report.recent_deaths), 2)
-        self.assertTrue(all(individual in report.recent_deaths for individual in [recent_death1, recent_death2]))
+        self.assertEqual(report.recent_deaths[0].detailType, "I1")
+        self.assertEqual(report.recent_deaths[1].detailType, "I2")
 
     def create_individual(self, id, name, sex, death_date):
-        individual = self.create_individual(id)
-        individual.name = name
-        individual.sex = sex
-        individual.death_date = death_date
-        return individual
+        return Individual(id, name, sex, None, death_date, None, [])
