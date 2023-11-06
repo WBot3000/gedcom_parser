@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from prettytable import PrettyTable
 from classes.GEDCOM_Units import GEDCOMUnit, Individual, Family, GEDCOMReadException
 
@@ -71,6 +71,10 @@ class Report():
         self.anomalies: list[ReportDetail] = []
         self.upcomingBirthdays: list[ReportDetail] = []
         self.upcomingAnniversaries: list[ReportDetail] = []
+
+
+        self.recentBirths: list[ReportDetail] = []
+        self.recentDeaths: list[ReportDetail] = []
 
         #Used for US01 - Dates before current date. Micro-optimization so that this doesn't need to be recalculated for every date checked (since it won't change).
         self.run_date: date = datetime.today().date()
@@ -455,31 +459,31 @@ class Report():
         for fam in self.fam_map.values():
             sorted_siblings = sorted(fam.childIds, key=age_sorting_fn)
             fam.childIds = sorted_siblings
+
+
     #US35 - List recent births 
     def list_recent_births(self, days_threshold=30):
-        recent_births = []
         current_date = datetime.now()
         threshold_date = current_date - timedelta(days=days_threshold)
 
-        for individual_id, individual in self.individuals.items():
-            if individual.birth_date is not None and individual.birth_date >= threshold_date:
-                recent_births.append(individual)
+        for individual_id, individual in self.indi_map.items():
+            if individual.birthDate is not None and individual.birthDate >= threshold_date.date():
+                self.recentBirths.append(ReportDetail(individual_id, individual.birthDate))
         # Sort recent_births by birth date
-        recent_births.sort(key=lambda x: x.birth_date)
-        return recent_births
+        self.recentBirths.sort(key=lambda x: x.message) # Message is the birth date
+
 
     #US36 - List recent deaths
     def list_recent_deaths(self, days_threshold=30):
-        recent_deaths = []
         current_date = datetime.now()
         threshold_date = current_date - timedelta(days=days_threshold)
 
-        for individual_id, individual in self.individuals.items():
-            if individual.death_date is not None and individual.death_date >= threshold_date:
-                recent_deaths.append(individual)
+        for individual_id, individual in self.indi_map.items():
+            if individual.deathDate is not None and individual.deathDate >= threshold_date.date():
+                self.recentDeaths.append(ReportDetail(individual_id, individual.deathDate))
         # Sort recent_deaths by death date
-        recent_deaths.sort(key=lambda x: x.death_date)
-        return recent_deaths
+        self.recentDeaths.sort(key=lambda x: x.message) # Message is the death date
+
 
     #US42 - Reject invalid dates
     #Wrapper around conversion function. Returns None if an error occurs
@@ -523,6 +527,16 @@ class Report():
         for anniversary in self.upcomingAnniversaries:
             anniversaryTable.add_row(anniversary.getRowData())
 
+        #Will print out all of the recent births stored in the recent birth list
+        recentBirthTable = PrettyTable(["Individual", "Birth Date"])
+        for birth in self.recentBirths:
+            recentBirthTable.add_row(birth.getRowData())
+
+        #Will print out all of the recent deaths stored in the recent death list
+        recentDeathTable = PrettyTable(["Individual", "Death Date"])
+        for death in self.recentDeaths:
+            recentDeathTable.add_row(death.getRowData())
+
         print("Individuals:")
         print(indiTable)
         print()
@@ -545,6 +559,12 @@ class Report():
 
         print("Upcoming Anniversaries:")
         print(anniversaryTable)
+
+        print("Recent Births")
+        print(recentBirthTable)
+
+        print("Recent Deaths")
+        print(recentDeathTable)
             
 
 #Contains all of the data regarding a certain detail to look out for during a report
