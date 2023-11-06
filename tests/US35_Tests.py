@@ -2,35 +2,33 @@
 #List recent births
 import unittest
 from datetime import datetime, timedelta
-from your_gedcom_parser import GEDCOMParser  # Import your GEDCOM parser class
+from classes.GEDCOM_Reporting import Report, ReportDetail
+from classes.GEDCOM_Units import GEDCOMUnit, Individual, Family
 
-class ListRecentBirthsTests(unittest.TestCase):
-    def test_no_recent_births(self):
-        parser = GEDCOMParser()
-        # Create individuals with no recent births
-        individual1 = Individual("I1", "John /Doe/", "M", datetime(1990, 1, 1))
-        individual2 = Individual("I2", "Jane /Doe/", "F", datetime(1985, 3, 15))
-        parser.individuals["I1"] = individual1
-        parser.individuals["I2"] = individual2
+class TestRecentBirths(unittest.TestCase):
+    def test_recent_births_within_threshold(self):
+        # Create a Report instance
+        report = Report()
 
-        recent_births = parser.list_recent_births(days_threshold=30)
+        # Create individuals with birth dates within the threshold
+        recent_birth1 = self.create_individual('I1', 'John Doe', 'M', (datetime.today() - timedelta(days=5)).date())
+        recent_birth2 = self.create_individual('I2', 'Jane Smith', 'F', (datetime.today() - timedelta(days=10)).date())
+        recent_birth3 = self.create_individual('I3', 'Tom Brown', 'M', (datetime.today() - timedelta(days=25)).date())
 
-        self.assertEqual(len(recent_births), 0)
+        # Add individuals to the report
+        report.indi_map = {
+            'I1': recent_birth1,
+            'I2': recent_birth2,
+            'I3': recent_birth3,
+        }
 
-    def test_recent_births(self):
-        parser = GEDCOMParser()
-        # Create individuals with recent births
-        current_date = datetime.now()
-        recent_birth_date = current_date - timedelta(days=15)
-        individual1 = Individual("I1", "John /Doe/", "M", recent_birth_date)
-        individual2 = Individual("I2", "Jane /Doe/", "F", datetime(1995, 5, 10))
-        parser.individuals["I1"] = individual1
-        parser.individuals["I2"] = individual2
+        # Call the function to update recent births within the report
+        report.list_recent_births(days_threshold=20)
 
-        recent_births = parser.list_recent_births(days_threshold=30)
+        # Assert that the recent births field is as expected
+        self.assertEqual(len(report.recent_births), 2)
+        self.assertEqual(report.recent_births[0].detailType, "I2")
+        self.assertEqual(report.recent_births[1].detailType, "I1")
 
-        self.assertEqual(len(recent_births), 1)
-        self.assertEqual(recent_births[0].id, "I1")
-
-if __name__ == '__main__':
-    unittest.main()
+    def create_individual(self, id, name, sex, birth_date):
+        return Individual(id, name, sex, birth_date, None, None, [])
