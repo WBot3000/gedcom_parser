@@ -198,13 +198,13 @@ class Report():
         wife = self.indi_map.get(family.wifeId, None)
         if family.divorceDate:
             divorceDate = family.divorceDate
-        elif husband.deathDate and wife.deathDate and husband.deathDate > wife.deathDate:
+        elif husband and wife and husband.deathDate and wife.deathDate and husband.deathDate > wife.deathDate:
             divorceDate = wife.deathDate
-        elif husband.deathDate and wife.deathDate and wife.deathDate > husband.deathDate:
+        elif husband and wife and husband.deathDate and wife.deathDate and wife.deathDate > husband.deathDate:
             divorceDate = husband.deathDate
-        elif husband.deathDate and wife.deathDate == None:
+        elif husband and wife and husband.deathDate and wife.deathDate == None:
             divorceDate = husband.deathDate
-        elif wife.deathDate and husband.deathDate == None:
+        elif husband and wife and wife.deathDate and husband.deathDate == None:
             divorceDate = wife.deathDate
         else:
             divorceDate = None
@@ -220,49 +220,53 @@ class Report():
             husband = self.indi_map.get(fam.husbandId, None)
             wife = self.indi_map.get(fam.wifeId, None)
             marriageDate = fam.marriageDate
-            divorceDate = self.get_divorceDate (fam)
-            if len(husband.spouseIn) > 1:
+            divorceDate = self.get_divorceDate(fam)
+            if husband and len(husband.spouseIn) > 1:
                 for famId in husband.spouseIn:
                     if famId != fam.id:
-                        family = self.fam_map.get(famId)
+                        family = self.fam_map.get(famId, None)
+                        if family is None:
+                            continue
                         marriageDateNew = family.marriageDate
                         divorceDateNew = self.get_divorceDate(family)
-                        if divorceDate != None and divorceDateNew != None:
-                            if marriageDate < marriageDateNew and divorceDate > marriageDateNew:
+                        if divorceDate is not None and divorceDateNew is not None:
+                            if marriageDate and marriageDateNew and marriageDate < marriageDateNew and divorceDate > marriageDateNew:
                                 bigamy_true.append(famId)
                                 self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-                            elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
+                            elif marriageDate and marriageDateNew and marriageDate > marriageDateNew and divorceDateNew > marriageDate:
                                 bigamy_true.append(famId)
                                 self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-                        elif divorceDateNew == None and divorceDate > marriageDateNew:
+                        elif divorceDate and marriageDateNew and divorceDateNew is None and divorceDate > marriageDateNew:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-                        elif divorceDate == None and marriageDate < divorceDateNew:
+                        elif divorceDateNew and marriageDate and divorceDate is None and marriageDate < divorceDateNew:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-                        elif divorceDate == None and divorceDateNew == None:
+                        elif divorceDate is None and divorceDateNew is None:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-            if len(wife.spouseIn) > 1:
+            if wife and len(wife.spouseIn) > 1:
                 for famId in wife.spouseIn:
                     if famId != fam.id:
-                        family = self.fam_map.get(famId)
+                        family = self.fam_map.get(famId, None)
+                        if family is None:
+                            continue
                         marriageDateNew = family.marriageDate
                         divorceDateNew = self.get_divorceDate(family)
-                        if divorceDate != None and divorceDateNew != None:
-                            if marriageDate < marriageDateNew and divorceDate > marriageDateNew:
+                        if divorceDate is not None and divorceDateNew is not None:
+                            if marriageDate and marriageDateNew and marriageDate < marriageDateNew and divorceDate > marriageDateNew:
                                 bigamy_true.append(famId)
                                 self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
-                            elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
+                            elif marriageDate and marriageDateNew and marriageDate > marriageDateNew and divorceDateNew > marriageDate:
                                 bigamy_true.append(famId)
                                 self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
-                        elif divorceDateNew == None and divorceDate > marriageDateNew:
+                        elif divorceDate and marriageDateNew and divorceDateNew is None and divorceDate > marriageDateNew:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
-                        elif divorceDate == None and marriageDate < divorceDateNew:
+                        elif divorceDateNew and marriageDate and divorceDate is None and marriageDate < divorceDateNew:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
-                        elif divorceDate == None and divorceDateNew == None:
+                        elif divorceDate is None and divorceDateNew is None:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
 
@@ -362,8 +366,109 @@ class Report():
                         male_surnames.append(child_surname)
             if(len(male_surnames) > 1):
                 self.anomalies.append(ReportDetail("Differing Male Surnames", f"Males in family {fam.id} have several different surnames {male_surnames}")) 
-                
-                
+
+
+    # US17: No Marriage to Descendants
+    # Marriage between ancestors and descendants is not allowed.
+
+    # Helper function to get descendants of an individual.
+    def get_descendants(self, individual_id):
+        descendants = set()
+        for family in self.fam_map.values():
+            if family.husbandId == individual_id or family.wifeId == individual_id:
+                for child_id in family.childIds:
+                    descendants.add(child_id)
+                    if(child_id != individual_id): #To prevent infinite recursion when a child is marked as their own parent
+                        descendants.update(self.get_descendants(child_id))
+        return descendants
+
+    def no_marriage_to_descendants(self):
+        # Iterate through individuals.
+        for ind in self.indi_map.values():
+            # Get descendants of the current individual.
+            descendants = self.get_descendants(ind.id)
+            if descendants:
+                # Iterate through families associated with the current individual.
+                for fam_id in ind.spouseIn:
+                    family = self.fam_map.get(fam_id, None)
+                    if family is not None:
+                        husband_id = family.husbandId
+                        wife_id = family.wifeId
+
+                        # Check if either the husband or wife is a descendant of the current individual.
+                        if husband_id in descendants or wife_id in descendants:
+                            if ind.id == husband_id and husband_id not in family.childIds: #Second check is to prevent incorrect recursive descendants
+                                otherIndi = self.indi_map.get(wife_id, None)
+                                otherIndiId = "NA" if otherIndi is None else otherIndi.id
+                                # Add a note about the marriage if the current individual is the husband.
+                                self.anomalies.append(ReportDetail("Marriage to Descendant",
+                                    f"{ind.id} is married to descendant, {otherIndiId}."))
+                            elif wife_id not in family.childIds:
+                                otherIndi = self.indi_map.get(husband_id, None)
+                                otherIndiId = "NA" if otherIndi is None else otherIndi.id
+                                # Add a note about the marriage if the current individual is the wife.
+                                self.anomalies.append(ReportDetail("Marriage to Descendant",
+                                    f"{ind.id} is married to descendant, {otherIndiId}."))
+                      
+
+    #US19
+    def first_cousins_should_not_marry(self):
+        # Create a dictionary to store the families of the grandparents of each individual
+        grandparents = {}
+
+        # Iterate through all families in the GEDCOM file
+        for fam in self.fam_map.values():
+            # Check if the family has children (individuals)
+            if fam.childIds:
+                # Get the grandparents (parents of the parents)
+                father = self.indi_map.get(fam.husbandId, None)
+                mother = self.indi_map.get(fam.wifeId, None)
+
+                patGrandpa = None
+                patGrandma = None
+                matGrandpa = None
+                matGrandma = None
+
+                if(father and father.childIn):
+                    fatherFamily = self.fam_map.get(father.childIn, None)
+                    if(fatherFamily):
+                        patGrandpa = fatherFamily.husbandId
+                        patGrandma = fatherFamily.wifeId
+
+                if(mother and mother.childIn):
+                    motherFamily = self.fam_map.get(mother.childIn, None)
+                    if(motherFamily):
+                        matGrandpa = motherFamily.husbandId
+                        matGrandma = motherFamily.wifeId
+
+                grandparentsSet = {patGrandpa, patGrandma, matGrandpa, matGrandma}
+                grandparentsSet.discard(None) #Get rid of None value if it's in the set
+
+                #if father or mother:
+                for child_id in fam.childIds:
+                    child = self.indi_map.get(child_id, None)
+                    if child:
+                        grandparents[child.id] = grandparentsSet
+                        #if((father and father.childIn) and (mother and mother.childIn)): # Multiple checks needed so that intersection doesn't contain any "None" values
+                            # Store the grandparents for the child
+                        #    grandparents[child.id] = {father.childIn, mother.childIn}
+                        #elif(father and father.childIn):
+                        #    grandparents[child.id] = {father.childIn}
+                        #elif(mother and mother.childIn):
+                        #    grandparents[child.id] = {mother.childIn}
+
+        # Iterate through the families to check if any have common grandparents (first cousins)
+        for fam in self.fam_map.values():
+            husband_parents = grandparents.get(fam.husbandId, set())
+            wife_parents = grandparents.get(fam.wifeId, set())
+
+            # Find common grandparents (first cousins)
+            common_grandparents = husband_parents.intersection(wife_parents)
+
+            # If there are common grandparents, it means first cousins are getting married
+            if common_grandparents:
+                error_message = f"First cousins are getting married in Family {fam.id}"
+                self.anomalies.append(ReportDetail("First Cousins Marrying", error_message))
 
 
     #US21 - Correct Gender of Role
