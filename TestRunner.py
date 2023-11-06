@@ -20,7 +20,7 @@ from tests.US21_Tests import TestCheckCorrectGenderForRoles as us21
 from tests.US22_Tests import US22_Tests as us22
 from tests.US23_Tests import TestCheckUniqueNamesAndBirthDates as us23
 from tests.US28_Tests import US28_Tests as us28
-from tests.US35_Tests import ListRecentBirthsTests as us35
+from tests.US35_Tests import TestRecentBirths as us35
 from tests.US36_Tests import TestRecentDeaths as us36
 from tests.US42_Tests import US42_Tests as us42
 
@@ -29,7 +29,7 @@ from tests.US42_Tests import US42_Tests as us42
 testCaseClassArray = [us01, us02, us03, us04, us05, us06, us07, None, None, us10, 
                       us11, us12, None, us14, us15, us16, us17, None, us19, None, 
                       us21, us22, us23, None, None, None, None, us28, None, None,
-                      None, None, None, None, None, None, None, None, None, None,
+                      None, None, None, None, us35, us36, None, None, None, None,
                       None, us42]
 
 def printTestCases(usNum: int):

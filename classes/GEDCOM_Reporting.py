@@ -72,6 +72,9 @@ class Report():
         self.upcomingBirthdays: list[ReportDetail] = []
         self.upcomingAnniversaries: list[ReportDetail] = []
 
+        self.recent_births: list[ReportDetail] = []
+        self.recent_deaths: list[ReportDetail] = []
+
         #Used for US01 - Dates before current date. Micro-optimization so that this doesn't need to be recalculated for every date checked (since it won't change).
         self.run_date: date = datetime.today().date()
         #Used for US22 - Unique IDs. Key is ID that's attempting to be duplicated, int is the amount of times it's duplicated (used to differentiate between IDs)
@@ -554,6 +557,32 @@ class Report():
             sorted_siblings = sorted(fam.childIds, key=age_sorting_fn)
             fam.childIds = sorted_siblings
 
+    # US35 - List recent births
+    def list_recent_births(self, days_threshold=30):
+        self.recent_births = []  # Clear the previous list
+        current_date = datetime.now()
+        threshold_date = current_date - timedelta(days=days_threshold)
+
+        for individual_id, individual in self.indi_map.items():
+            if individual.birthDate is not None and individual.birthDate >= threshold_date.date():
+                self.recent_births.append(ReportDetail(individual_id, individual.birthDate))
+
+        # Sort recent_births by birth date
+        self.recent_births.sort(key=lambda x: x.message)
+
+    # US36 - List recent deaths
+    def list_recent_deaths(self, days_threshold=30):
+        self.recent_deaths = []  # Clear the previous list
+        current_date = datetime.now()
+        threshold_date = current_date - timedelta(days=days_threshold)
+
+        for individual_id, individual in self.indi_map.items():
+            if individual.deathDate is not None and individual.deathDate >= threshold_date.date():
+                self.recent_deaths.append(ReportDetail(individual_id, individual.deathDate))
+
+        # Sort recent_deaths by death date
+        self.recent_deaths.sort(key=lambda x: x.message)
+
 
     #US42 - Reject invalid dates
     #Wrapper around conversion function. Returns None if an error occurs
@@ -597,6 +626,16 @@ class Report():
         for anniversary in self.upcomingAnniversaries:
             anniversaryTable.add_row(anniversary.getRowData())
 
+        #Will print out all of the recent births stored in the recent birth list
+        recentBirthTable = PrettyTable(["Individual", "Birth Date"])
+        for birth in self.recent_births:
+            recentBirthTable.add_row(birth.getRowData())
+
+        #Will print out all of the recent deaths stored in the recent death list
+        recentDeathTable = PrettyTable(["Individual", "Death Date"])
+        for death in self.recent_deaths:
+            recentDeathTable.add_row(death.getRowData())
+
         print("Individuals:")
         print(indiTable)
         print()
@@ -619,6 +658,12 @@ class Report():
 
         print("Upcoming Anniversaries:")
         print(anniversaryTable)
+
+        print("Recent Births")
+        print(recentBirthTable)
+
+        print("Recent Deaths")
+        print(recentDeathTable)
             
 
 #Contains all of the data regarding a certain detail to look out for during a report
