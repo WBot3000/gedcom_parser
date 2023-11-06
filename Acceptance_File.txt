@@ -203,4 +203,74 @@
 2 DATE 5 OCT 2015
 1 DIV
 2 DATE 1 AUG 2007
+0 NOTE ------------------------------------------------
+0 bi06 INDI
+1 NAME Recently /Born/
+1 SEX M
+1 BIRT
+2 DATE 4 NOV 2023
+0 NOTE ------------------------------------------------
+0 bi07 INDI
+1 NAME Just /Passed/
+1 SEX M
+1 DEAT
+2 DATE 4 NOV 2023
+0 NOTE ------------------------------------------------
+0 x00 INDI
+1 NAME Grandpa /Family/
+1 SEX M
+1 FAMS f03
+0 NOTE ------------------------------------------------
+0 x01 INDI
+1 NAME Grandma /Family/
+1 SEX F
+1 FAMS f03
+0 NOTE ------------------------------------------------
+0 x02 INDI
+1 NAME Father /Family/
+1 SEX M
+1 FAMC f03
+1 FAMS f04
+0 NOTE ------------------------------------------------
+0 x03 INDI
+1 NAME Aunt /Family/
+1 SEX F
+1 FAMC f03
+1 FAMS f05
+1 FAMS f07
+0 NOTE ------------------------------------------------
+0 x04 INDI
+1 NAME Cousin1 /Family/
+1 SEX F
+1 FAMC f04
+1 FAMS f06
+0 NOTE ------------------------------------------------
+0 x05 INDI
+1 NAME Cousin2 /Family/
+1 SEX M
+1 FAMC f05
+1 FAMS f06
+1 FAMS f07
+0 NOTE ------------------------------------------------
+0 f03 FAM
+1 HUSB x00
+1 WIFE x01
+1 CHIL x02
+1 CHIL x03
+0 NOTE ------------------------------------------------
+0 f04 FAM
+1 HUSB x02
+1 CHIL x04
+0 NOTE ------------------------------------------------
+0 f05 FAM
+1 HUSB x03
+1 CHIL x05
+0 NOTE ------------------------------------------------
+0 f06 FAM
+1 HUSB x05
+1 WIFE x04
+0 NOTE ------------------------------------------------
+0 f07 FAM
+1 HUSB x05
+1 WIFE x03
 0 TRLR
