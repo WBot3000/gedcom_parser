@@ -215,13 +215,15 @@ class Report():
     def check_bigamy(self):
         bigamy_true = []
         for fam in self.fam_map.values():
+            if fam.divorceDate == None:
+                divorceDate = self.get_divorceDate (fam)
+                fam.divorceDate = divorceDate
             if fam.id in bigamy_true:
                 continue
             husband = self.indi_map.get(fam.husbandId, None)
             wife = self.indi_map.get(fam.wifeId, None)
             marriageDate = fam.marriageDate
-            divorceDate = self.get_divorceDate (fam)
-            if len(husband.spouseIn) > 1:
+            if husband and len(husband.spouseIn) > 1:
                 for famId in husband.spouseIn:
                     if famId != fam.id:
                         family = self.fam_map.get(famId)
@@ -234,16 +236,17 @@ class Report():
                             elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
                                 bigamy_true.append(famId)
                                 self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
+                        elif divorceDate == None and divorceDateNew == None:
+                            bigamy_true.append(famId)
+                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDateNew == None and divorceDate > marriageDateNew:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDate == None and marriageDate < divorceDateNew:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-                        elif divorceDate == None and divorceDateNew == None:
-                            bigamy_true.append(famId)
-                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + husband.id + " and families are " + fam.id + " and " + famId))
-            if len(wife.spouseIn) > 1:
+                        
+            if wife and len(wife.spouseIn) > 1:
                 for famId in wife.spouseIn:
                     if famId != fam.id:
                         family = self.fam_map.get(famId)
@@ -256,16 +259,15 @@ class Report():
                             elif marriageDate > marriageDateNew and divorceDateNew > marriageDate:
                                 bigamy_true.append(famId)
                                 self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
+                        elif divorceDate == None and divorceDateNew == None:
+                            bigamy_true.append(famId)
+                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDateNew == None and divorceDate > marriageDateNew:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
                         elif divorceDate == None and marriageDate < divorceDateNew:
                             bigamy_true.append(famId)
                             self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
-                        elif divorceDate == None and divorceDateNew == None:
-                            bigamy_true.append(famId)
-                            self.anomalies.append(ReportDetail("Bigamy", "Spouse details are: " + wife.id + " and families are " + fam.id + " and " + famId))
-
 
     #US12 - Parents not too old
     # This checks all of the families and compares the ages of both parents to their 
@@ -456,6 +458,30 @@ class Report():
             sorted_siblings = sorted(fam.childIds, key=age_sorting_fn)
             fam.childIds = sorted_siblings
 
+    #US30 - List Living Married
+    def check_married_status (self, indi):
+        famID_list = []
+        if len(indi.spouseIn) > 0:
+            for famId in indi.spouseIn:
+                family = self.fam_map.get(famId)
+                divorceDate = self.get_divorceDate(family)
+                if divorceDate == None:
+                    famID_list.append(famId)
+        return famID_list
+
+    #US31 - List Living Single
+    def check_single_status (self, indi):
+        if len(indi.spouseIn) > 0:
+            for famId in indi.spouseIn:
+                family = self.fam_map.get(famId)
+                divorceDate = self.get_divorceDate(family)
+                if divorceDate == None:
+                    return False
+            return True
+        else:
+            return True
+
+
 
     #US42 - Reject invalid dates
     #Wrapper around conversion function. Returns None if an error occurs
@@ -494,6 +520,22 @@ class Report():
         for bday in self.upcomingBirthdays:
             bdayTable.add_row(bday.getRowData())
 
+        #Will print out all living married individuals
+        livingMarriedTable = PrettyTable(["ID", "Name", "Family ID"])
+        for indi in self.indi_map.values():
+            if indi.deathDate == None:
+                present_family = self.check_married_status (indi)
+                if len(present_family) > 0:
+                    livingMarriedTable.add_row([indi.id, indi.name, present_family])
+
+        #Will print out all singles who are above 30
+        singleAbove30Table = PrettyTable(["ID", "Name", "Age"])
+        for indi in self.indi_map.values():
+            if indi.deathDate == None and indi.calculateAge() > 30:
+                single_status = self.check_single_status (indi)
+                if single_status == True:
+                    singleAbove30Table.add_row([indi.id, indi.name, indi.calculateAge()])
+
         #Will print out all of the upcoming anniversaries stored in the anniversary list
         anniversaryTable = PrettyTable(["Family", "Anniversary"])
         for anniversary in self.upcomingAnniversaries:
@@ -513,6 +555,14 @@ class Report():
 
         print("Anomalies:")
         print(anomalyTable)
+        print()
+
+        print("Living Married People:")
+        print(livingMarriedTable)
+        print()
+
+        print("Single Living Above 30:")
+        print(singleAbove30Table)
         print()
 
         print("Upcoming Birthdays:")
