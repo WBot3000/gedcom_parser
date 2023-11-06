@@ -449,13 +449,6 @@ class Report():
                     child = self.indi_map.get(child_id, None)
                     if child:
                         grandparents[child.id] = grandparentsSet
-                        #if((father and father.childIn) and (mother and mother.childIn)): # Multiple checks needed so that intersection doesn't contain any "None" values
-                            # Store the grandparents for the child
-                        #    grandparents[child.id] = {father.childIn, mother.childIn}
-                        #elif(father and father.childIn):
-                        #    grandparents[child.id] = {father.childIn}
-                        #elif(mother and mother.childIn):
-                        #    grandparents[child.id] = {mother.childIn}
 
         # Iterate through the families to check if any have common grandparents (first cousins)
         for fam in self.fam_map.values():
