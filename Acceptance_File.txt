@@ -1,5 +1,5 @@
 0 HEAD
-0 NOTE Acceptance Test GEDCOM File for WBot3000/gedcom_parser. Should mention all 8 errors for each user story
+0 NOTE Acceptance Test GEDCOM File for WBot3000/gedcom_parser. Should mention all 24 errors for each user story
 0 bi00 INDI
 1 NAME Walker /Bove/
 1 SEX M

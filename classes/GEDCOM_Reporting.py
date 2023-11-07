@@ -714,9 +714,11 @@ class Report():
 
         print("Upcoming Anniversaries:")
         print(anniversaryTable)
+        print()
 
         print("Recent Births")
         print(recentBirthTable)
+        print()
 
         print("Recent Deaths")
         print(recentDeathTable)
