@@ -218,6 +218,7 @@ class Report():
     def check_bigamy(self):
         bigamy_true = []
         for fam in self.fam_map.values():
+            divorceDate = None
             if fam.divorceDate == None:
                 divorceDate = self.get_divorceDate (fam)
                 fam.divorceDate = divorceDate
@@ -658,10 +659,15 @@ class Report():
         #Will print out all singles who are above 30
         singleAbove30Table = PrettyTable(["ID", "Name", "Age"])
         for indi in self.indi_map.values():
-            if indi.deathDate == None and indi.calculateAge() > 30:
-                single_status = self.check_single_status (indi)
-                if single_status == True:
-                    singleAbove30Table.add_row([indi.id, indi.name, indi.calculateAge()])
+            try:
+                indiAge = indi.calculateAge()
+            except ValueError:
+                continue
+            else:
+                if indi.deathDate == None and indiAge > 30:
+                    single_status = self.check_single_status (indi)
+                    if single_status == True:
+                        singleAbove30Table.add_row([indi.id, indi.name, indiAge])
 
         #Will print out all of the upcoming anniversaries stored in the anniversary list
         anniversaryTable = PrettyTable(["Family", "Anniversary"])
