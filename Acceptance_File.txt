@@ -125,7 +125,7 @@
 1 FAMC f02
 0 NOTE ------------------------------------------------
 0 sib09 INDI
-1 NAME Iggy /Mouse/
+1 NAME Kevin /Mouse/
 1 SEX M
 1 BIRT
 2 DATE 3 APR 2018
@@ -273,4 +273,16 @@
 0 f07 FAM
 1 HUSB x05
 1 WIFE x03
+0 NOTE ------------------------------------------------
+0 ghost INDI
+1 NAME Phantom /Man/
+1 SEX M
+1 FAMS fakefamily
+1 FAMC fakechildhood
+0 NOTE ------------------------------------------------
+0 lonely FAM
+1 HUSB notrealhusband
+1 WIFE notrealwife
+1 CHIL notrealchild1
+1 CHIL notrealchild2
 0 TRLR

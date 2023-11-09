@@ -197,6 +197,8 @@ class Report():
 
     #Calculate divorce date
     def get_divorceDate (self, family):
+        if(family is None):
+            return None
         husband = self.indi_map.get(family.husbandId, None)
         wife = self.indi_map.get(family.wifeId, None)
         if family.divorceDate:
@@ -287,7 +289,7 @@ class Report():
             if(len(fam.childIds) == 0 or (fam.husbandId is None and fam.wifeId is None)): #Don't bother if there's no children or no parents
                 continue
             else:
-                kidsInfo = list(filter(lambda kid: kid.birthDate is not None, map(lambda kidId: self.indi_map.get(kidId, None), fam.childIds))) #Get the information of all the kids, and remove the ones without birthdays
+                kidsInfo = list(filter(lambda kid: (kid is not None and kid.birthDate is not None), map(lambda kidId: self.indi_map.get(kidId, None), fam.childIds))) #Get the information of all the kids, and remove the ones without birthdays
                 kidsAges = list(map(lambda kid: kid.calculateAge(), kidsInfo)) #Get all fo their ages
             dadInfo: Individual = self.indi_map.get(fam.husbandId, None)
             if(dadInfo and dadInfo.birthDate):
@@ -544,6 +546,88 @@ class Report():
                     sharedName += namePart
                 detailStr += f"share a name ({sharedName}) and birthday ({sharedBDay})"
                 self.anomalies.append(ReportDetail("Duplicate Name and Birthdate", detailStr))
+
+
+    #US25 - Unique first names in families
+    def get_first_name(self, name: str):
+        surnameStartPos: int = name.find("/")
+        if(surnameStartPos == -1): #No slashes present, so no surname. Just return the whole name.
+            return name
+        surnameEndPos: int = name.find("/", surnameStartPos+1) #Find the next slash after the previous one
+        if(surnameEndPos == -1): #If that's the only slash present, then just assume that the last name is until the end of the name
+            surnameEndPos = len(name)
+        if(surnameStartPos+1 == surnameEndPos): #Have encountered two slashes next to each other, this name is empty
+            return ""
+        else: #Get the stuff not in between the slashes  (including the spaces before and after the slashes)
+            return name[0:surnameStartPos].rstrip() + name[surnameEndPos+1:len(name)].lstrip()
+        
+    def check_sibling_same_name(self):
+        for fam in self.fam_map.values():
+            sibling_name_dict = {}
+            for siblingId in fam.childIds:
+                sibling = self.indi_map.get(siblingId, None)
+                if(sibling and sibling.name):
+                    firstName = self.get_first_name(sibling.name)
+                    if(firstName in sibling_name_dict):
+                        sibling_name_dict[firstName].append(sibling.id)
+                    else:
+                        sibling_name_dict[firstName] = [sibling.id]
+            
+            for name, ids in sibling_name_dict.items():
+                if(len(ids) > 1):
+                    self.anomalies.append(ReportDetail("Siblings Shared Name", f"Siblings {ids} share a first name ({name})"))
+
+
+    #US26 - Corresponding Entries
+    # Makes sure that families specified in individual records exist and match, same for individuals mentioned in family records
+    def check_corresponding_entries(self):
+        for indi in self.indi_map.values():
+            #Childhood family check
+            if(indi.childIn):
+                childhoodFamily: Family = self.fam_map.get(indi.childIn, None)
+                if(childhoodFamily is None):
+                    self.errors.append(ReportDetail("Correspondance Error", f"Family {indi.childIn} specified in individual {indi.id} is not present in the family records"))
+                elif(indi.id not in childhoodFamily.childIds):
+                    self.errors.append(ReportDetail("Correspondance Error", f"Family {indi.childIn} specified in individual {indi.id} does not have {indi.id} as a child"))
+            #Spousal families check
+            if(len(indi.spouseIn) > 0):
+                for famId in indi.spouseIn:
+                    spousalFamily: Family = self.fam_map.get(famId, None)
+                    if(spousalFamily is None):
+                        self.errors.append(ReportDetail("Correspondance Error", f"Family {famId} specified in individual {indi.id} is not present in the family records"))
+                    #elif(indi.sex == "M" and spousalFamily.husbandId != indi.id):
+                    #    self.errors.append(ReportDetail("Correspondance Error", f"Family {famId} specified in individual {indi.id} does not have {indi.id} as its husband"))
+                    #elif(indi.sex == "F" and spousalFamily.wifeId != indi.id):
+                    #    self.errors.append(ReportDetail("Correspondance Error", f"Family {famId} specified in individual {indi.id} does not have {indi.id} as its wife"))
+                    #Previous stuff has been commented out since it's covered by another error
+                    elif(spousalFamily.husbandId != indi.id and spousalFamily.wifeId != indi.id): 
+                        self.errors.append(ReportDetail("Correspondance Error", f"Family {famId} specified in individual {indi.id} does not have {indi.id} as a spouse"))
+
+        for fam in self.fam_map.values():
+            #Check husband
+            if(fam.husbandId):
+                husband: Individual = self.indi_map.get(fam.husbandId, None)
+                if(husband is None):
+                    self.errors.append(ReportDetail("Correspondance Error", f"Husband {fam.husbandId} specified in family {fam.id} is not present in the individual records"))
+                elif(fam.id not in husband.spouseIn):
+                    self.errors.append(ReportDetail("Correspondance Error", f"Husband {fam.husbandId} specified in family {fam.id} does not have {fam.id} as a corresponding spousal family"))
+            #Check wife
+            if(fam.wifeId):
+                wife: Individual = self.indi_map.get(fam.wifeId, None)
+                if(wife is None):
+                    self.errors.append(ReportDetail("Correspondance Error", f"Wife {fam.wifeId} specified in family {fam.id} is not present in the individual records"))
+                elif(fam.id not in wife.spouseIn):
+                    self.errors.append(ReportDetail("Correspondance Error", f"Wife {fam.wifeId} specified in family {fam.id} does not have {fam.id} as a corresponding spousal family"))
+            #Check children
+            for childId in fam.childIds:
+                child: Individual = self.indi_map.get(childId, None)
+                if(child is None):
+                    self.errors.append(ReportDetail("Correspondance Error", f"Child {childId} specified in family {fam.id} is not present in the individual records"))
+                elif(fam.id != child.childIn):
+                    self.errors.append(ReportDetail("Correspondance Error", f"Child {childId} specified in family {fam.id} does not have {fam.id} as their childhood family")) 
+
+
+
 
     
     #US28 - Order siblings by age

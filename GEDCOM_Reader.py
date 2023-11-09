@@ -88,6 +88,7 @@ except Exception as e:
     print("Error encountered: " + os.strerror(e.errno))
 else:
     #Checks
+    report.check_corresponding_entries() #US26, felt like it fit more at the beginning despite being the 26th story
     report.birth_before_marriage() #US02
     report.birth_before_death() #US03
     report.marriage_before_divorce() #US04
@@ -104,6 +105,7 @@ else:
     report.first_cousins_should_not_marry() #US19
     report.check_correct_gender_for_roles() #US21
     report.check_unique_name_and_birth_date() #US23
+    report.check_sibling_same_name() #US25
     report.sort_children_by_age() #US28
     report.list_recent_births() #US35 
     report.list_recent_deaths() #US36
