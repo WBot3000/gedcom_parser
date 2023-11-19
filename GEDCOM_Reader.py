@@ -102,6 +102,7 @@ else:
     report.fewer_than_15_siblings() #US15
     report.check_family_male_surnames() #US16
     report.no_marriage_to_descendants() #US17
+    report.no_sibling_marriage() #US18
     report.first_cousins_should_not_marry() #US19
     report.check_correct_gender_for_roles() #US21
     report.check_unique_name_and_birth_date() #US23
@@ -109,5 +110,6 @@ else:
     report.sort_children_by_age() #US28
     report.list_recent_births() #US35 
     report.list_recent_deaths() #US36
+    report.list_upcoming_birthdays() #US38
     report.printReport()
 
