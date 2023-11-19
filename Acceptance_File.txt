@@ -172,6 +172,7 @@
 1 BIRT
 2 DATE 3 APR 2018
 1 FAMC f02
+1 FAMS f08
 0 NOTE ------------------------------------------------
 0 sib16 INDI
 1 NAME Petunia /Mouse/
@@ -179,6 +180,7 @@
 1 BIRT
 2 DATE 5 MAR 2016
 1 FAMC f02
+1 FAMS f08
 0 NOTE ------------------------------------------------
 0 f02 FAM
 1 HUSB bi05
@@ -273,6 +275,10 @@
 0 f07 FAM
 1 HUSB x05
 1 WIFE x03
+0 NOTE ------------------------------------------------
+0 f08 FAM
+1 HUSB sib15
+1 WIFE sib16
 0 NOTE ------------------------------------------------
 0 ghost INDI
 1 NAME Phantom /Man/
