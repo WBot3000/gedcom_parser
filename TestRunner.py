@@ -27,6 +27,7 @@ from tests.US30_Tests import US30_Tests as us30
 from tests.US31_Tests import US31_Tests as us31
 from tests.US35_Tests import TestRecentBirths as us35
 from tests.US36_Tests import TestRecentDeaths as us36
+from tests.US38_Tests import TestUpcomingBirthdaysSorting as us38
 from tests.US42_Tests import US42_Tests as us42
 
 #Index of the array is the number of the corresponding user story minus 1
@@ -34,7 +35,7 @@ from tests.US42_Tests import US42_Tests as us42
 testCaseClassArray = [us01, us02, us03, us04, us05, us06, us07, None, None, us10, 
                       us11, us12, None, us14, us15, us16, us17, us18, us19, None, 
                       us21, us22, us23, None, us25, us26, None, us28, None, us30,
-                      us31, None, None, None, us35, us36, None, None, None, None,
+                      us31, None, None, None, us35, us36, None, us38, None, None,
                       None, us42]
 
 def printTestCases(usNum: int):
