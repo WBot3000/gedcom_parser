@@ -426,7 +426,7 @@ class Report():
         ind1 = self.indi_map.get(ind_id_1, None)
         ind2 = self.indi_map.get(ind_id_2, None)
 
-        if ind1 is not None and ind2 is not None and ind1.childIn is not None and ind1.childIn is not None:
+        if ind1 is not None and ind2 is not None and ind1.childIn is not None and ind2.childIn is not None:
             return ind1.childIn == ind2.childIn
         else:
             return False
