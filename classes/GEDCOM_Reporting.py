@@ -417,8 +417,32 @@ class Report():
                                 # Add a note about the marriage if the current individual is the wife.
                                 self.anomalies.append(ReportDetail("Marriage to Descendant",
                                     f"{ind.id} is married to descendant, {otherIndiId}."))
+        
                       
+    #US18 - Siblings should not marry
 
+    def are_siblings(self, ind_id_1, ind_id_2):
+        # Check if two individuals are siblings
+        ind1 = self.indi_map.get(ind_id_1, None)
+        ind2 = self.indi_map.get(ind_id_2, None)
+
+        if ind1 is not None and ind2 is not None:
+            return ind1.famc == ind2.famc
+        else:
+            return False
+
+    def no_sibling_marriage(self):
+        # Iterate through families.
+        for family in self.fam_map.values():
+            husband_id = family.husbandId
+            wife_id = family.wifeId
+
+            # Check if the husband and wife are siblings.
+            if self.are_siblings(husband_id, wife_id):
+                # Add a note about the marriage.
+                self.anomalies.append(ReportDetail("Sibling Marriage",
+                    f"Siblings {husband_id} and {wife_id} should not marry."))
+                
     #US19
     def first_cousins_should_not_marry(self):
         # Create a dictionary to store the families of the grandparents of each individual
@@ -695,6 +719,21 @@ class Report():
         self.recent_deaths.sort(key=lambda x: x.message)
 
 
+    # US38 - List upcoming birthdays
+    def list_upcoming_birthdays(self, days_threshold=30):
+        upcoming_birthdays = []  # A list to store upcoming birthday records
+        current_date = datetime.now()
+        threshold_date = current_date + timedelta(days=days_threshold)
+
+        for individual_id, individual in self.individuals.items():
+            if individual.birth_date is not None and individual.birth_date <= threshold_date:
+                upcoming_birthdays.append(individual)
+
+        # Sort upcoming_birthdays by birth date
+        upcoming_birthdays.sort(key=lambda x: x.birth_date)
+
+        return upcoming_birthdays
+        
     #US42 - Reject invalid dates
     #Wrapper around conversion function. Returns None if an error occurs
     def getDateFromString(self, string: str) -> str:
