@@ -735,11 +735,11 @@ class Report():
                 except ValueError: #If date exists yet a value error is still raised, then they were born on a leap year, but next birthday won't be on a leap year
                     upcoming_birthday = date(current_date.year + bdayHasPassedInt, 2, 28)
                 if upcoming_birthday >= current_date and upcoming_birthday <= threshold_date: #If birthday is upcoming, it should be after or equal to today's date, but before (or equal to) the threshold
-                    upcoming_birthdays.append((individual, upcoming_birthday))
+                    upcoming_birthdays.append((individual_id, upcoming_birthday))
 
         upcoming_birthdays.sort(key=lambda x: x[1])
-        for (individual, bday) in upcoming_birthdays:
-            self.upcomingBirthdays.append(ReportDetail(individual.id, bday))
+        for (individual_id, bday) in upcoming_birthdays:
+            self.upcomingBirthdays.append(ReportDetail(individual_id, bday))
         return upcoming_birthdays
                 
         
