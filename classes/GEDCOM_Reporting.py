@@ -112,10 +112,10 @@ class Report():
     def birth_before_marriage(self):
         for fam in self.fam_map.values():
             husband = self.indi_map.get(fam.husbandId, None)
-            if(husband and husband.birthDate and husband.birthDate > fam.marriageDate):
+            if(husband and husband.birthDate and fam.marriageDate and husband.birthDate > fam.marriageDate):
                 self.errors.append(ReportDetail("Birth After Marriage", "Birth of " + husband.id + " (" +  str(husband.birthDate) + ") occurred after their marriage (" + str(fam.marriageDate) + ")"))
             wife = self.indi_map.get(fam.wifeId, None)
-            if(wife and wife.birthDate and wife.birthDate > fam.marriageDate):
+            if(wife and wife.birthDate and fam.marriageDate and wife.birthDate > fam.marriageDate):
                 self.errors.append(ReportDetail("Birth After Marriage", "Birth of " + wife.id + " (" +  str(wife.birthDate) + ") occurred after their marriage (" + str(fam.marriageDate) + ")"))
     
     #US03 - Birth before Death
@@ -175,7 +175,7 @@ class Report():
 
         
     #US10 - Marriage after 14
-    # Marriage should be at least 14 years after birth of both spouses (parents must be at least 14 years old)
+    # Marriage should be at least 14 years after birth of both spouses (husband and wife must be at least 14 years old)
     def marriage_after_14(self):
         for fam in self.fam_map.values():
             husband = self.indi_map.get(fam.husbandId, None)
@@ -417,8 +417,32 @@ class Report():
                                 # Add a note about the marriage if the current individual is the wife.
                                 self.anomalies.append(ReportDetail("Marriage to Descendant",
                                     f"{ind.id} is married to descendant, {otherIndiId}."))
+        
                       
+    #US18 - Siblings should not marry
 
+    def are_siblings(self, ind_id_1, ind_id_2):
+        # Check if two individuals are siblings
+        ind1 = self.indi_map.get(ind_id_1, None)
+        ind2 = self.indi_map.get(ind_id_2, None)
+
+        if ind1 is not None and ind2 is not None and ind1.childIn is not None and ind1.childIn is not None:
+            return ind1.childIn == ind2.childIn
+        else:
+            return False
+
+    def no_sibling_marriage(self):
+        # Iterate through families.
+        for family in self.fam_map.values():
+            husband_id = family.husbandId
+            wife_id = family.wifeId
+
+            # Check if the husband and wife are siblings.
+            if self.are_siblings(husband_id, wife_id):
+                # Add a note about the marriage.
+                self.anomalies.append(ReportDetail("Sibling Marriage",
+                    f"Siblings {husband_id} and {wife_id} should not marry."))
+                
     #US19
     def first_cousins_should_not_marry(self):
         # Create a dictionary to store the families of the grandparents of each individual
@@ -695,6 +719,30 @@ class Report():
         self.recent_deaths.sort(key=lambda x: x.message)
 
 
+    # US38 - List upcoming birthdays
+    def list_upcoming_birthdays(self, days_threshold=30):
+        upcoming_birthdays = []  # A list to store upcoming birthday records
+        current_date = datetime.now().date()
+        threshold_date = current_date + timedelta(days=days_threshold)
+
+        for individual_id, individual in self.indi_map.items():
+            if individual.birthDate is not None:
+                bdayHasPassedInt = 1 if (individual.birthDate.month < current_date.month or (individual.birthDate.month == current_date.month and individual.birthDate.day < current_date.day)) else 0
+                #birthdayHasPassedInt is 1 if birthday has passed within the year, otherwise it's 0. Used to get the year that the individual's next birthday will be on
+                upcoming_birthday: date
+                try:
+                    upcoming_birthday = individual.birthDate.replace(year=current_date.year + bdayHasPassedInt) #Return birthday, but with the current year
+                except ValueError: #If date exists yet a value error is still raised, then they were born on a leap year, but next birthday won't be on a leap year
+                    upcoming_birthday = date(current_date.year + bdayHasPassedInt, 2, 28)
+                if upcoming_birthday >= current_date and upcoming_birthday <= threshold_date: #If birthday is upcoming, it should be after or equal to today's date, but before (or equal to) the threshold
+                    upcoming_birthdays.append((individual, upcoming_birthday))
+
+        upcoming_birthdays.sort(key=lambda x: x[1])
+        for (individual, bday) in upcoming_birthdays:
+            self.upcomingBirthdays.append(ReportDetail(individual.id, bday))
+        return upcoming_birthdays
+                
+        
     #US42 - Reject invalid dates
     #Wrapper around conversion function. Returns None if an error occurs
     def getDateFromString(self, string: str) -> str:
