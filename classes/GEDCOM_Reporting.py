@@ -173,7 +173,38 @@ class Report():
                 if(age > 150):
                     self.errors.append(ReportDetail("Over 150 Years Old", f"{indi.id} is over 150 years old ({age} years old)"))
 
-        
+    #US08 - Birth after marriage of parents
+    def check_birth_after_parents_marriage (self):
+        for fam in self.fam_map.values():
+            if fam.divorceDate == None:
+                divorceDate = self.get_divorceDate (fam)
+            if len(fam.childIds) > 0:
+                for childId in fam.childIds:
+                    child = self.indi_map.get(childId, None)
+                    if child and fam.marriageDate == None:
+                        self.anomalies.append(ReportDetail("Birth without marriage of parents", "Birth of " + childId + " (" +  str(child.birthDate) + ") occured without parents marriage"))
+                    elif child and fam.marriageDate and fam.marriageDate > child.birthDate:
+                        self.anomalies.append(ReportDetail("Birth before marriage of parents", "Birth of " + childId + " (" +  str(child.birthDate) + ") occured before marriage of parents (" + str(fam.marriageDate) + ")"))
+                    if child and divorceDate != None and (child.birthDate - divorceDate).days > 270:
+                        self.anomalies.append(ReportDetail("Birth after divorce of parents", "Birth of " + childId + " (" +  str(child.birthDate) + ") occured after 9 months after divorce of parents (" + str(divorceDate) + ")"))
+
+
+    #US09 - Birth before death of parents
+    def check_birth_before_death_parents (self):
+        for fam in self.fam_map.values():
+            husband = self.indi_map.get(fam.husbandId, None)
+            wife = self.indi_map.get(fam.wifeId, None)
+            if wife and wife.deathDate != None and len(fam.childIds) > 0:
+                for childId in fam.childIds:
+                    child = self.indi_map.get(childId, None)
+                    if child and child.birthDate > wife.deathDate:
+                        self.anomalies.append(ReportDetail("Birth before death of parents", "Birth of " + childId + " (" +  str(child.birthDate) + ") occured after death of mother (" + str(wife.deathDate) + ")"))
+            if husband and husband.deathDate != None and len(fam.childIds) > 0:
+                for childId in fam.childIds:
+                    child = self.indi_map.get(childId, None)
+                    if (child.birthDate - husband.deathDate).days > 270:
+                        self.anomalies.append(ReportDetail("Birth before death of parents", "Birth of " + childId + " (" +  str(child.birthDate) + ") occured after 9 months after death of father (" + str(husband.deathDate) + ")"))
+    
     #US10 - Marriage after 14
     # Marriage should be at least 14 years after birth of both spouses (husband and wife must be at least 14 years old)
     def marriage_after_14(self):
