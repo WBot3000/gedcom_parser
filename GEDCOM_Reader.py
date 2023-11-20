@@ -95,6 +95,8 @@ else:
     report.marriage_before_death() #US05
     report.divorce_before_death() #US06
     report.check_max_age() #US07
+    report.check_birth_after_parents_marriage() #US08
+    report.check_birth_before_death_parents() #US09
     report.marriage_after_14() #US10
     report.check_bigamy() #US11
     report.check_parent_child_age_difference() #US12

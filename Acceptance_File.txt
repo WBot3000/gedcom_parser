@@ -210,13 +210,13 @@
 1 NAME Recently /Born/
 1 SEX M
 1 BIRT
-2 DATE 4 NOV 2023
+2 DATE 18 NOV 2023
 0 NOTE ------------------------------------------------
 0 bi07 INDI
 1 NAME Just /Passed/
 1 SEX M
 1 DEAT
-2 DATE 4 NOV 2023
+2 DATE 18 NOV 2023
 0 NOTE ------------------------------------------------
 0 x00 INDI
 1 NAME Grandpa /Family/
@@ -293,4 +293,36 @@
 1 WIFE notrealwife
 1 CHIL notrealchild1
 1 CHIL notrealchild2
+0 NOTE ------------------------------------------------
+0 deceasedmom INDI
+1 NAME Mother /Deceased/
+1 SEX F
+1 BIRT
+2 DATE 1 JAN 1955
+1 DEAT
+2 DATE 1 JAN 2000
+1 FAMS deceasedfam
+0 NOTE ------------------------------------------------
+0 deceaseddad INDI
+1 NAME Father /Deceased/
+1 SEX M
+1 BIRT
+2 DATE 1 JAN 1955
+1 DEAT
+2 DATE 1 JAN 2000
+1 FAMS deceasedfam
+0 NOTE ------------------------------------------------
+0 notdeceasedkid INDI
+1 NAME Child Not /Deceased/
+1 SEX M
+1 BIRT
+2 DATE 1 JAN 2001
+1 FAMC deceasedfam
+0 NOTE ------------------------------------------------
+0 deceasedfam FAM
+1 WIFE deceasedmom
+1 HUSB deceaseddad
+1 CHIL notdeceasedkid
+1 MARR
+2 DATE 1 JAN 2003
 0 TRLR
