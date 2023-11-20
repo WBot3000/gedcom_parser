@@ -8,6 +8,8 @@ from tests.US04_Tests import US04_Tests as us04
 from tests.US05_Tests import US05_Tests as us05 
 from tests.US06_Tests import US06_Tests as us06
 from tests.US07_Tests import US07_Tests as us07
+from tests.US08_Tests import US08_Tests as us08
+from tests.US09_Tests import US09_Tests as us09
 from tests.US10_Tests import US10_Tests as us10
 from tests.US11_Tests import US11_Tests as us11
 from tests.US12_Tests import US12_Tests as us12
@@ -32,7 +34,7 @@ from tests.US42_Tests import US42_Tests as us42
 
 #Index of the array is the number of the corresponding user story minus 1
 #Fill this out as test case files are written
-testCaseClassArray = [us01, us02, us03, us04, us05, us06, us07, None, None, us10, 
+testCaseClassArray = [us01, us02, us03, us04, us05, us06, us07, us08, us09, us10, 
                       us11, us12, None, us14, us15, us16, us17, us18, us19, None, 
                       us21, us22, us23, None, us25, us26, None, us28, None, us30,
                       us31, None, None, None, us35, us36, None, us38, None, None,
