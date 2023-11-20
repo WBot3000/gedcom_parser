@@ -692,6 +692,26 @@ class Report():
             return True
 
 
+    # US34 - List couples married when the older spouse was more than twice as old as the younger spouse
+    def list_couples_with_large_age_difference(self):
+        #userStoryName('US34-List Couples with Large Age Difference')
+        #output('\t' + 'HUSBAND' + '\t\t\t\t' + 'WIFE' + '\t\t\t\t' + 'MARRIAGE DATE')
+
+        for family_id, family in self.fam_map.items():
+            husband = self.indi_map.get(family.husbandId)
+            wife = self.indi_map.get(family.wifeId)
+
+            if husband and wife and husband.birthDate and wife.birthDate:# and family.marriageDate:
+                age_difference = abs((husband.birthDate - wife.birthDate).days) // 365
+                husbandAge = husband.calculateAge()
+                wifeAge = wife.calculateAge()
+                if age_difference > min(husbandAge, wifeAge):
+                    if husband.birthDate < wife.birthDate:
+                        self.anomalies.append(ReportDetail("Large Couple Age Gap", f"Husband {husband.id} (age {husbandAge}) is over twice as old as his wife {wife.id} (age {wifeAge})"))
+                    else:
+                        self.anomalies.append(ReportDetail("Large Couple Age Gap", f"Wife {wife.id} (age {wifeAge}) is over twice as old as her husband {husband.id} (age {husbandAge})"))
+
+
     # US35 - List recent births
     def list_recent_births(self, days_threshold=30):
         self.recent_births = []  # Clear the previous list
@@ -704,6 +724,7 @@ class Report():
 
         # Sort recent_births by birth date
         self.recent_births.sort(key=lambda x: x.message)
+
 
     # US36 - List recent deaths
     def list_recent_deaths(self, days_threshold=30):
@@ -728,10 +749,10 @@ class Report():
         for individual_id, individual in self.indi_map.items():
             if individual.birthDate is not None:
                 bdayHasPassedInt = 1 if (individual.birthDate.month < current_date.month or (individual.birthDate.month == current_date.month and individual.birthDate.day < current_date.day)) else 0
-                #birthdayHasPassedInt is 1 if birthday has passed within the year, otherwise it's 0. Used to get the year that the individual's next birthday will be on
+                #bdayHasPassedInt is 1 if birthday has passed within the year, otherwise it's 0. Used to get the year that the individual's next birthday will be on
                 upcoming_birthday: date
                 try:
-                    upcoming_birthday = individual.birthDate.replace(year=current_date.year + bdayHasPassedInt) #Return birthday, but with the current year
+                    upcoming_birthday = individual.birthDate.replace(year=current_date.year + bdayHasPassedInt)
                 except ValueError: #If date exists yet a value error is still raised, then they were born on a leap year, but next birthday won't be on a leap year
                     upcoming_birthday = date(current_date.year + bdayHasPassedInt, 2, 28)
                 if upcoming_birthday >= current_date and upcoming_birthday <= threshold_date: #If birthday is upcoming, it should be after or equal to today's date, but before (or equal to) the threshold
@@ -741,7 +762,31 @@ class Report():
         for (individual_id, bday) in upcoming_birthdays:
             self.upcomingBirthdays.append(ReportDetail(individual_id, bday))
         return upcoming_birthdays
-                
+
+
+    # US39 - List upcoming anniversaries
+    def list_upcoming_anniversaries(self, days_threshold=30):
+        upcoming_anniversaries = []  # A list to store upcoming anniversary records
+        current_date = datetime.now().date()
+        threshold_date = current_date + timedelta(days=days_threshold)
+
+        for family_id, family in self.fam_map.items():
+            if family.marriageDate is not None and family.divorceDate is None: #Don't return anniversary dates for divorced couples
+                anvHasPassedInt = 1 if (family.marriageDate.month < current_date.month or (family.marriageDate.month == current_date.month and family.marriageDate.day < current_date.day)) else 0
+                #anvHasPassedInt is 1 if birthday has passed within the year, otherwise it's 0. Used to get the year that the individual's next birthday will be on
+                upcoming_anniversary: date
+                try:
+                    upcoming_anniversary = family.marriageDate.replace(year=current_date.year + anvHasPassedInt)
+                except ValueError: #If date exists yet a value error is still raised, then the anniversary is on a leap year, but no leap day on the corresponding year
+                    upcoming_anniversary = date(current_date.year + anvHasPassedInt, 2, 28)
+                if upcoming_anniversary >= current_date and upcoming_anniversary <= threshold_date: #If anniversary is upcoming, it should be after or equal to today's date, but before (or equal to) the threshold
+                    upcoming_anniversaries.append((family_id, upcoming_anniversary))
+
+        upcoming_anniversaries.sort(key=lambda x: x[1])
+        for (family_id, anv) in upcoming_anniversaries:
+            self.upcomingAnniversaries.append(ReportDetail(family_id, anv))
+        return upcoming_anniversaries
+       
         
     #US42 - Reject invalid dates
     #Wrapper around conversion function. Returns None if an error occurs

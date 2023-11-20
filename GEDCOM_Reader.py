@@ -108,8 +108,10 @@ else:
     report.check_unique_name_and_birth_date() #US23
     report.check_sibling_same_name() #US25
     report.sort_children_by_age() #US28
+    report.list_couples_with_large_age_difference() #US34
     report.list_recent_births() #US35 
     report.list_recent_deaths() #US36
     report.list_upcoming_birthdays() #US38
+    report.list_upcoming_anniversaries() #US39
     report.printReport()
 
