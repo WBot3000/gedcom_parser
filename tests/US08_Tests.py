@@ -16,7 +16,7 @@ class US08_Tests(unittest.TestCase):
         testReport.addToReport(family)
 
         testReport.check_birth_after_parents_marriage()
-        self.assertEqual(testReport.errors[0].message, "Birth of I3 (2007-01-29) occured before marriage of parents (2008-04-03)")
+        self.assertEqual(testReport.anomalies[0].message, "Birth of I3 (2007-01-29) occured before marriage of parents (2008-04-03)")
 
     def test_check_birth_after_parents_marriage_no_error (self):
         testReport: Report = Report()
@@ -31,7 +31,8 @@ class US08_Tests(unittest.TestCase):
         testReport.addToReport(family)
 
         testReport.check_birth_after_parents_marriage()
-        self.assertEqual(len(testReport.errors), 0)
+        self.assertEqual(len(testReport.anomalies), 0)
+
 
     def test_check_birth_after_parents_marriage_divorce_error (self):
         testReport: Report = Report()
@@ -46,4 +47,4 @@ class US08_Tests(unittest.TestCase):
         testReport.addToReport(family)
 
         testReport.check_birth_after_parents_marriage()
-        self.assertEqual(testReport.errors[0].message, "Birth of I3 (2007-01-29) occured after 9 months after divorce of parents (2006-04-03)")
+        self.assertEqual(testReport.anomalies[0].message, "Birth of I3 (2007-01-29) occured after 9 months after divorce of parents (2006-04-03)")
