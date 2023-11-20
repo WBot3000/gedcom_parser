@@ -146,7 +146,7 @@ class Report():
     def check_marriage_before_death(self, spouse_id, family):
         spouse = self.indi_map.get(spouse_id)
         
-        if spouse and spouse.deathDate and spouse.deathDate < family.marriageDate:
+        if spouse and spouse.deathDate and family.marriageDate and spouse.deathDate < family.marriageDate:
             error_message = f"Marriage of {family.id} ({family.marriageDate}) occurs after the death of {spouse.name} ({spouse.deathDate})"
             self.errors.append(ReportDetail("Marriage After Death", error_message))
 
