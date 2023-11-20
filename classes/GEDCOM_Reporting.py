@@ -144,9 +144,9 @@ class Report():
             self.check_marriage_before_death(fam.wifeId, fam)
 
     def check_marriage_before_death(self, spouse_id, family):
-        spouse = self.indi_map.get(spouse_id)
+        spouse = self.indi_map.get(spouse_id, None)
         
-        if spouse and spouse.deathDate and spouse.deathDate < family.marriageDate:
+        if spouse and spouse.deathDate and family.marriageDate and spouse.deathDate < family.marriageDate:
             error_message = f"Marriage of {family.id} ({family.marriageDate}) occurs after the death of {spouse.name} ({spouse.deathDate})"
             self.errors.append(ReportDetail("Marriage After Death", error_message))
 
@@ -596,8 +596,10 @@ class Report():
                 sharedDetails = key.split(" ")
                 sharedBDay = sharedDetails.pop()
                 sharedName = ""
-                for namePart in sharedDetails: #Need to reassemble the name
-                    sharedName += namePart
+                for i in range(len(sharedDetails)): #Need to reassemble the name
+                    sharedName += sharedDetails[i]
+                    if i != len(sharedDetails) - 1:
+                        sharedName += " "
                 detailStr += f"share a name ({sharedName}) and birthday ({sharedBDay})"
                 self.anomalies.append(ReportDetail("Duplicate Name and Birthdate", detailStr))
 

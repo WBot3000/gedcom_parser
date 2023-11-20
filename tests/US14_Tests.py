@@ -40,7 +40,7 @@ class US14_Tests(unittest.TestCase):
         testReport.addToReport(family1)
 
         testReport.check_multiple_births()
-        self.assertEqual(len(testReport.errors), 0)
+        self.assertEqual(len(testReport.anomalies), 0)
 
     def test_multiple_births_over_5_error(self):
         testReport: Report = Report()
@@ -61,4 +61,4 @@ class US14_Tests(unittest.TestCase):
         testReport.addToReport(family1)
 
         testReport.check_multiple_births()
-        self.assertEqual(testReport.errors[0].message, "More than five siblings were born on 1990-01-01 in family F1.")
+        self.assertEqual(testReport.anomalies[0].message, "More than five siblings were born on 1990-01-01 in family F1.")
