@@ -32,5 +32,5 @@ class TestFewerThan15Siblings(unittest.TestCase):
         report.fewer_than_15_siblings()
 
         # Assert that an error was added to the report
-        self.assertEqual(len(report.errors), 1)
-        self.assertEqual(report.errors[0].detailType, "Too Many Siblings")
+        self.assertEqual(len(report.anomalies), 1)
+        self.assertEqual(report.anomalies[0].detailType, "Too Many Siblings")

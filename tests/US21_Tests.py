@@ -7,7 +7,7 @@ from classes.GEDCOM_Reporting import Report
 class TestCheckCorrectGenderForRoles(unittest.TestCase):
     def test_correct_gender_for_husband_and_wife(self):
         # Create a GedcomParser instance
-        parser = GEDCOMUnit()
+        parser = Report()
 
         # Create individuals
         husband = Individual("Husband", "Husband /Lastname/", "M", date(1980, 1, 1), None, None, None)
@@ -27,9 +27,10 @@ class TestCheckCorrectGenderForRoles(unittest.TestCase):
         # Assert that there are no errors in the report
         self.assertEqual(len(parser.errors), 0)
 
+
     def test_incorrect_gender_for_husband(self):
         # Create a GedcomParser instance
-        parser = GEDCOMUnit()
+        parser = Report()
 
         # Create individuals with incorrect genders
         husband = Individual("Husband", "Husband /Lastname/", "F", date(1980, 1, 1), None, None, None)
@@ -50,9 +51,10 @@ class TestCheckCorrectGenderForRoles(unittest.TestCase):
         self.assertEqual(len(parser.errors), 1)
         self.assertEqual(parser.errors[0].message, "Husband in family F1 is female")
 
+
     def test_incorrect_gender_for_wife(self):
         # Create a GedcomParser instance
-        parser = GEDCOMUnit()
+        parser = Report()
 
         # Create individuals with incorrect genders
         husband = Individual("Husband", "Husband /Lastname/", "M", date(1980, 1, 1), None, None, None)

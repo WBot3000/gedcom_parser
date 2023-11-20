@@ -596,8 +596,10 @@ class Report():
                 sharedDetails = key.split(" ")
                 sharedBDay = sharedDetails.pop()
                 sharedName = ""
-                for namePart in sharedDetails: #Need to reassemble the name
-                    sharedName += namePart
+                for i in range(len(sharedDetails)): #Need to reassemble the name
+                    sharedName += sharedDetails[i]
+                    if i != len(sharedDetails) - 1:
+                        sharedName += " "
                 detailStr += f"share a name ({sharedName}) and birthday ({sharedBDay})"
                 self.anomalies.append(ReportDetail("Duplicate Name and Birthdate", detailStr))
 

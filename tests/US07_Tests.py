@@ -9,7 +9,7 @@ class US07_Tests(unittest.TestCase):
         indiA: Individual = Individual("a", "John /Doe/", "M", date(1990, 1, 1))
         testReport.addToReport(indiA)
         testReport.check_max_age()
-        self.assertEqual(testReport.anomalies, [], "Test Report has errors, despite all people being 150 years old or less")
+        self.assertEqual(testReport.errors, [], "Test Report has errors, despite all people being 150 years old or less")
 
 
     def test_too_old_alive(self):
@@ -17,7 +17,7 @@ class US07_Tests(unittest.TestCase):
         indi: Individual = Individual("a", "John /Doe/", "M", date(1800, 1, 1))
         testReport.addToReport(indi)
         testReport.check_max_age()
-        self.assertEqual(testReport.anomalies, [ReportDetail("Over 150 Years Old", "a is over 150 years old (223 years old)")], "Test Report has no errors, despite the user being 223 years old")
+        self.assertEqual(testReport.errors, [ReportDetail("Over 150 Years Old", f"a is over 150 years old ({indi.calculateAge()} years old)")], f"Test Report has no errors, despite the user being {indi.calculateAge()} years old")
 
 
     def test_too_old_deceased(self):
@@ -25,7 +25,7 @@ class US07_Tests(unittest.TestCase):
         indi: Individual = Individual("a", "Ol' Johnny /Doesph/", "M", date(1700, 1, 1), date(1900, 2, 2))
         testReport.addToReport(indi)
         testReport.check_max_age()
-        self.assertEqual(testReport.anomalies, [ReportDetail("Over 150 Years Old", "a is over 150 years old (200 years old)")], "Test Report has no errors, despite the user being 200 years old")
+        self.assertEqual(testReport.errors, [ReportDetail("Over 150 Years Old", f"a is over 150 years old ({indi.calculateAge()} years old)")], f"Test Report has no errors, despite the user being {indi.calculateAge()} years old")
 
 
     def test_too_old_alive_no_bday(self):
@@ -33,11 +33,11 @@ class US07_Tests(unittest.TestCase):
         indi: Individual = Individual("a", "Jane /Doe/", "F", None)
         testReport.addToReport(indi)
         testReport.check_max_age()
-        self.assertEqual(testReport.anomalies, [], "Test Report has errors, despite the user not having a birthdate (while alive)")
+        self.assertEqual(testReport.errors, [], "Test Report has errors, despite the user not having a birthdate (while alive)")
 
     def test_too_old_deceased_no_bday(self):
         testReport: Report = Report()
         indi: Individual = Individual("a", "Ol' Janine /Doesph/", "F", None, date(2005, 9, 3))
         testReport.addToReport(indi)
         testReport.check_max_age()
-        self.assertEqual(testReport.anomalies, [], "Test Report has errors, despite the user not having a birthdate (while deceased)")
+        self.assertEqual(testReport.errors, [], "Test Report has errors, despite the user not having a birthdate (while deceased)")
